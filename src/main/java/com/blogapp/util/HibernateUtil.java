@@ -16,8 +16,12 @@ public class HibernateUtil {
 
     private static SessionFactory buildSessionFactory() {
         try {
-            logger.info("Building Hibernate SessionFactory");
-            return new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
+            logger.debug("Attempting to build SessionFactory");
+            Configuration configuration = new Configuration().configure("hibernate.cfg.xml");
+            logger.debug("Configuration created, building SessionFactory");
+            SessionFactory factory = configuration.buildSessionFactory();
+            logger.debug("SessionFactory built successfully");
+            return factory;
         } catch (Throwable ex) {
             logger.error("Initial SessionFactory creation failed.", ex);
             throw new ExceptionInInitializerError(ex);
@@ -31,5 +35,9 @@ public class HibernateUtil {
     public static void shutdown() {
         logger.info("Shutting down Hibernate SessionFactory");
         getSessionFactory().ifPresent(SessionFactory::close);
+    }
+
+    static {
+        System.setProperty("log4j.configurationFile", "log4j2.xml");
     }
 }

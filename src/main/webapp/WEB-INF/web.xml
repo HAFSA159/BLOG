@@ -16,7 +16,7 @@
     <url-pattern>/</url-pattern>
 </servlet-mapping>
     
-<servlet>
+<!-- <servlet>
     <servlet-name>ArticleServlet</servlet-name>
     <servlet-class>com.blogapp.controller.ArticleServlet</servlet-class>
 </servlet>
@@ -25,22 +25,37 @@
     <url-pattern>/article</url-pattern>
 </servlet-mapping>
 
-<servlet>
-    <servlet-name>CommentServlet</servlet-name>
-    <servlet-class>com.blogapp.controller.CommentServlet</servlet-class>
-</servlet>
-<servlet-mapping>
-    <servlet-name>CommentServlet</servlet-name>
-    <url-pattern>/comment</url-pattern>
-</servlet-mapping>
+    <servlet>
+        <servlet-name>CommentServlet</servlet-name>
+        <servlet-class>com.blogapp.controller.CommentServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CommentServlet</servlet-name>
+        <url-pattern>/comment</url-pattern>
+    </servlet-mapping>
 
-<servlet>
-    <servlet-name>AuthorServlet</servlet-name>
-    <servlet-class>com.blogapp.controller.AuthorServlet</servlet-class>
-</servlet>
-<servlet-mapping>
-    <servlet-name>AuthorServlet</servlet-name>
-    <url-pattern>/author</url-pattern>
-</servlet-mapping>
+    <servlet>
+        <servlet-name>AuthorServlet</servlet-name>
+        <servlet-class>com.blogapp.controller.AuthorServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AuthorServlet</servlet-name>
+        <url-pattern>/author</url-pattern>
+    </servlet-mapping> -->
 
+<listener>
+    <listener-class>com.blogapp.config.LogInitializer</listener-class>
+</listener>
+
+<context-param>
+    <param-name>log4jConfiguration</param-name>
+    <param-value>classpath:log4j2.xml</param-value>
+</context-param>
+
+<jsp-config>
+    <taglib>
+        <taglib-uri>http://java.sun.com/jsp/jstl/core</taglib-uri>
+        <taglib-location>/WEB-INF/c.tld</taglib-location>
+    </taglib>
+</jsp-config>
 </web-app>
