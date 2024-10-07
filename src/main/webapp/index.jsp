@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test Page</title>
+    <title>Hello World</title>
 </head>
 <body>
     <h1>Hello, World!</h1>
-    <p>Current time: <%= new java.util.Date() %></p>
+    <h2>Welcome to my blog application</h2>
 </body>
 </html>
