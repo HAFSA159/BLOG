@@ -1,10 +1,10 @@
 # Application Web de Gestion de Blog
 
-## Description
+## 📜 Contexte du Projet
 
 Cette application web est une extension interactive et participative d'une solution de gestion de Blog console. Elle permet la gestion d'articles de blog, de commentaires, et d'auteurs, avec une interface utilisateur intuitive et des fonctionnalités robustes basées sur les concepts avancés de Java. Le projet est structuré autour de l'architecture MVC et utilise des technologies Java essentielles telles que les **Servlets**, **JSP**, **JSTL**, et **Hibernate** pour la persistance des données.
 
-## Objectifs
+## 🎯 Objectifs
 
 1. Créer une application web Java basée sur l'architecture MVC, utilisant Servlets, JSP et JSTL.
 2. Implémenter les opérations CRUD (Create, Read, Update, Delete) pour les **articles**, **commentaires**, et **utilisateurs**.
@@ -52,7 +52,17 @@ Cette application web est une extension interactive et participative d'une solut
 - **CSS Framework** pour le design responsive
 - **Figma** pour le maquettage de l'interface
 
-## Exigences Techniques
+## ⚙️ Exigences Techniques
+
+![Java](https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=java&logoColor=white)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-005E6C?style=flat-square&logo=mysql&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-563D7C?style=flat-square&logo=bootstrap&logoColor=white)
+![Tomcat](https://img.shields.io/badge/Apache%20Tomcat-F8DC75?style=flat-square&logo=apachetomcat&logoColor=black)
+![Maven](https://img.shields.io/badge/Apache%20Maven-C71A36?style=flat-square&logo=apachemaven&logoColor=white)
+![Singleton](https://img.shields.io/badge/Singleton-000000?style=flat-square&logo=github&logoColor=white)
+![JDBC](https://img.shields.io/badge/JDBC-005E6C?style=flat-square&logo=mysql&logoColor=white)
+![Servlets](https://img.shields.io/badge/Servlets-000000?style=flat-square&logo=java&logoColor=white)
 
 - Utilisation de l'architecture MVC découpée en plusieurs couches : **Présentation**, **Contrôleur**, **Service**, **DAO**, **Repository**, **Utilitaires**.
 - **Servlets et JSP** sans annotations (via `web.xml`).
@@ -65,14 +75,14 @@ Cette application web est une extension interactive et participative d'une solut
 - Persistance des données avec **JPA** et **Hibernate**.
 - Développement itératif basé sur les principes **Scrum**.
 
-## Concepts Java Avancés
+## 📚 Concepts Java Avancés
 
 - **Java Time API** et **Collection API**.
 - Utilisation de **HashMaps**, **Lambda Expressions**, et **Java Stream API**.
 - Gestion des valeurs nulles avec **Optional**.
 - **Java Streams** pour un traitement fluide des collections.
 
-## Structure du Projet
+## 📦 Structure du Projet
 
 Le projet est organisé de manière modulaire et suit une architecture en couches :
 
