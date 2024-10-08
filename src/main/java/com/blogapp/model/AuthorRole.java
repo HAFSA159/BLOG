@@ -1,4 +1,6 @@
 package com.blogapp.model;
 
-public class AuthorRole {
+public enum AuthorRole {
+    Contributor,
+    Editor
 }

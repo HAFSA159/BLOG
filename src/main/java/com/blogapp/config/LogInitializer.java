@@ -16,6 +16,7 @@ public class LogInitializer implements ServletContextListener {
         if (!logsDirFile.exists()) {
             logsDirFile.mkdirs();
         }
+        System.setProperty("log.dir", logsDir);
     }
 
     @Override
