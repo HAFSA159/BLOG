@@ -7,41 +7,13 @@
     <display-name>Blog Application</display-name>
 
    <welcome-file-list>
-    <welcome-file>index.html</welcome-file>
-        <welcome-file>index.jsp</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
     
 <servlet-mapping>
     <servlet-name>default</servlet-name>
     <url-pattern>/</url-pattern>
 </servlet-mapping>
-    
-<!-- <servlet>
-    <servlet-name>ArticleServlet</servlet-name>
-    <servlet-class>com.blogapp.controller.ArticleServlet</servlet-class>
-</servlet>
-<servlet-mapping>
-    <servlet-name>ArticleServlet</servlet-name>
-    <url-pattern>/article</url-pattern>
-</servlet-mapping>
-
-    <servlet>
-        <servlet-name>CommentServlet</servlet-name>
-        <servlet-class>com.blogapp.controller.CommentServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>CommentServlet</servlet-name>
-        <url-pattern>/comment</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>AuthorServlet</servlet-name>
-        <servlet-class>com.blogapp.controller.AuthorServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>AuthorServlet</servlet-name>
-        <url-pattern>/author</url-pattern>
-    </servlet-mapping> -->
 
 <listener>
     <listener-class>com.blogapp.config.LogInitializer</listener-class>

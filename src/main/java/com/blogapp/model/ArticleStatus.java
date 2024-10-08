@@ -1,4 +1,6 @@
 package com.blogapp.model;
 
-public class ArticleStatus {
+public enum ArticleStatus {
+    draft,
+    published
 }
