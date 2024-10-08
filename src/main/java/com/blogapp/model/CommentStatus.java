@@ -1,4 +1,6 @@
 package com.blogapp.model;
 
-public class CommentStatus {
+public enum CommentStatus {
+    approved,
+    rejected
 }
