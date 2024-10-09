@@ -1,7 +1,7 @@
 package com.blogapp.service;
 
 import java.util.List;
-
+import org.mindrot.jbcrypt.BCrypt;
 import com.blogapp.model.Author;
 import com.blogapp.repository.AuthorRepository;
 
@@ -46,6 +46,15 @@ public class AuthorService {
 
     public Author findAuthorByEmail(String email) {
         return authorRepository.findByEmail(email);
+    }
+
+    public boolean authenticate(String email, String password) {
+        Author author = findAuthorByEmail(email);
+        // Verify the entered password against the hashed password stored in the database
+        if (author != null && BCrypt.checkpw(password, author.getPassword())) {
+            return true;
+        }
+        return false;
     }
 
     public AuthorRepository getAuthorRepository() {
