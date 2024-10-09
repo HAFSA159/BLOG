@@ -7,7 +7,7 @@ CREATE TABLE Author (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    password varchar(100) NOT NULL,
+    password VARCHAR(100) NOT NULL,
     birthdate DATE NOT NULL,
     role ENUM('Contributor', 'Editor') NOT NULL
 );
@@ -35,17 +35,17 @@ CREATE TABLE Comment (
 );
 
 -- Insert sample data into Author
-INSERT INTO Author (name, email, birthdate, role) VALUES
-('John Doe', 'john.doe@example.com', '1985-05-15', 'Contributor'),
-('Jane Smith', 'jane.smith@example.com', '1990-08-22', 'Editor'),
-('Alice Johnson', 'alice.johnson@example.com', '1988-03-10', 'Contributor'),
-('Bob Williams', 'bob.williams@example.com', '1982-11-30', 'Editor');
+INSERT INTO Author (name, email, password, birthdate, role) VALUES
+('John Doe', 'john.doe@example.com', '$2a$10$Zs8gGTh3AapgHqsIXDZu1O963oYMhOBUSf7z0u8DBXZ6HIb92gd5W', '1985-05-15', 'Contributor'), -- password123
+('Jane Smith', 'jane.smith@example.com', '$2a$10$Zs8gGTh3AapgHqsIXDZu1O963oYMhOBUSf7z0u8DBXZ6HIb92gd5W', '1990-08-22', 'Editor'), -- password123
+('Alice Johnson', 'alice.johnson@example.com', '$2a$10$Zs8gGTh3AapgHqsIXDZu1O963oYMhOBUSf7z0u8DBXZ6HIb92gd5W', '1988-03-10', 'Contributor'), -- password123
+('Bob Williams', 'bob.williams@example.com', '$2a$10$Zs8gGTh3AapgHqsIXDZu1O963oYMhOBUSf7z0u8DBXZ6HIb92gd5W', '1982-11-30', 'Editor'); -- password123
 
 -- Insert sample data into Article
 INSERT INTO Article (title, content, creation_date, publication_date, status, author_id) VALUES
 ('First Blog Post', 'This is the content of the first blog post.', '2023-05-01 10:00:00', '2023-05-02 12:00:00', 'published', 1),
 ('Draft Article', 'This article is still in draft.', '2023-05-03 09:00:00', NULL, 'draft', 2),
-('Tech News', 'Latest updates in the tech world.', '2023-05-04 11:00:00', '2023-05-05 10:00:00', 'published', 3),
+('Tech News', 'Latest aupdates in the tech world.', '2023-05-04 11:00:00', '2023-05-05 10:00:00', 'published', 3),
 ('Archived Post', 'This post has been archived.', '2023-04-15 14:00:00', '2023-04-16 09:00:00', 'draft', 4);
 
 -- Insert sample data into Comment
@@ -61,4 +61,4 @@ CREATE INDEX idx_article_creation_date ON Article(creation_date);
 CREATE INDEX idx_comment_creation_date ON Comment(creation_date);
 
 -- Grant privileges (adjust as needed for your specific database user)
-GRANT SELECT, INSERT, UPDATE, DELETE ON blogapp.* TO 'root'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON blogapp.* TO 'root'@'localhost'  ;

@@ -1,3 +1,10 @@
+<%
+    // Check if the session attribute "loggedInUser" is set
+    if (session.getAttribute("loggedInUser") == null) {
+        response.sendRedirect("login.jsp");
+        return; // Ensure no further processing happens after redirect
+    }
+%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
@@ -29,27 +36,33 @@
                 </form>
             </div>
         </div>
-        <div class="row">
-            <c:forEach var="article" items="${articles}">
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 card-hover">
-                        <div class="card-body">
-                            <h5 class="card-title">${article.title}</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">By ${article.author.name}</h6>
-                            <p class="card-text">
-                                ${article.content != null ? (article.content.length() > 100 ? article.content.substring(0, 100) : article.content) : ''}
-                                ${article.content != null && article.content.length() > 100 ? '...' : ''}
-                            </p>
-                        </div>
-                        <div class="card-footer bg-transparent">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Content Preview</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="article" items="${articles}">
+                    <tr>
+                        <td>${article.title}</td>
+                        <td>${article.author.name}</td>
+                        <td>
+                            ${article.content != null ? (article.content.length() > 100 ? article.content.substring(0, 100) : article.content) : ''}
+                            ${article.content != null && article.content.length() > 100 ? '...' : ''}
+                        </td>
+                        <td>
                             <a href="<c:url value='/article/view?id=${article.id}'/>" class="btn btn-sm btn-info"><i class="fas fa-eye"></i> View</a>
                             <a href="<c:url value='/article/edit?id=${article.id}'/>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</a>
                             <a href="<c:url value='/article/delete?id=${article.id}'/>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this article?')"><i class="fas fa-trash-alt"></i> Delete</a>
-                        </div>
-                    </div>
-                </div>
-            </c:forEach>
-        </div>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
         <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">
                 <c:forEach begin="1" end="${noOfPages}" var="i">

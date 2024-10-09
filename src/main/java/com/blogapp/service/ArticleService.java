@@ -7,7 +7,7 @@ import com.blogapp.repository.ArticleRepository;
 
 public class ArticleService {
     private ArticleRepository articleRepository;
-
+ 
     public ArticleService(ArticleRepository articleRepository) {
         this.articleRepository = articleRepository;
     }
