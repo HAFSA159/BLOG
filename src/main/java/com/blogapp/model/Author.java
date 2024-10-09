@@ -2,7 +2,6 @@ package com.blogapp.model;
 
 import java.time.LocalDate;
 import java.util.List;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,6 +26,9 @@ public class Author {
 
     @Column(nullable = false, unique = true, length = 100)
     private String email;
+
+    @Column(nullable = false, length = 100)
+    private String password;
 
     @Column(nullable = false)
     private LocalDate birthdate;
@@ -53,5 +55,45 @@ public class Author {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;  // Added setter for email
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public LocalDate getBirthdate() {
+        return birthdate;  // Added getter for birthdate
+    }
+
+    public void setBirthdate(LocalDate birthdate) {  // Added setter for birthdate
+        this.birthdate = birthdate;
+    }
+
+    public AuthorRole getRole() {
+        return role;  // Added getter for role
+    }
+
+    public void setRole(AuthorRole role) {  // Added setter for role
+        this.role = role;
+    }
+
+    public List<Article> getArticles() {
+        return articles;
+    }
+
+    public void setArticles(List<Article> articles) {
+        this.articles = articles;
     }
 }
