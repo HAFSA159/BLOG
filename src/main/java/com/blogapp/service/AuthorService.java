@@ -6,7 +6,7 @@ import com.blogapp.model.Author;
 import com.blogapp.repository.AuthorRepository;
 
 public class AuthorService {
-    private AuthorRepository authorRepository;
+    private final AuthorRepository authorRepository;
 
     public AuthorService(AuthorRepository authorRepository) {
         this.authorRepository = authorRepository;
@@ -21,15 +21,31 @@ public class AuthorService {
     }
 
     public void addAuthor(Author author) {
-        authorRepository.save(author);
+        if (authorRepository.findByEmail(author.getEmail()) == null) {
+            authorRepository.save(author);
+        } else {
+            throw new IllegalArgumentException("An author with this email already exists.");
+        }
     }
 
     public void updateAuthor(Author author) {
-        authorRepository.update(author);
+        if (authorRepository.findById(author.getId()) != null) {
+            authorRepository.update(author);
+        } else {
+            throw new IllegalArgumentException("Author not found for the given ID.");
+        }
     }
 
     public void deleteAuthor(Long id) {
-        authorRepository.delete(id);
+        if (authorRepository.findById(id) != null) {
+            authorRepository.delete(id);
+        } else {
+            throw new IllegalArgumentException("Author not found for the given ID.");
+        }
+    }
+
+    public Author findAuthorByEmail(String email) {
+        return authorRepository.findByEmail(email);
     }
 
     public AuthorRepository getAuthorRepository() {

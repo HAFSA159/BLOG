@@ -1,7 +1,6 @@
 package com.blogapp.repository.impl;
 
 import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
@@ -37,7 +36,7 @@ public class AuthorRepositoryImpl implements AuthorRepository {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            throw e;
+            throw new RuntimeException("Failed to save the author", e);
         }
     }
 
@@ -52,7 +51,7 @@ public class AuthorRepositoryImpl implements AuthorRepository {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            throw e;
+            throw new RuntimeException("Failed to update the author", e);
         }
     }
 
@@ -70,7 +69,18 @@ public class AuthorRepositoryImpl implements AuthorRepository {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            throw e;
+            throw new RuntimeException("Failed to delete the author", e);
+        }
+    }
+
+    @Override
+    public Author findByEmail(String email) {
+        try {
+            return entityManager.createQuery("FROM Author a WHERE a.email = :email", Author.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
+        } catch (Exception e) {
+            return null;
         }
     }
 
