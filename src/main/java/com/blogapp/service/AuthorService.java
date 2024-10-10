@@ -27,12 +27,16 @@ public class AuthorService {
 
 
     public void addAuthor(Author author) {
-        if (authorRepository.findByEmail(author.getEmail()) == null) {
-            authorRepository.save(author);
-        } else {
+        // Check if an author with the given email already exists
+        if (authorRepository.findByEmail(author.getEmail()) != null) {
             throw new IllegalArgumentException("An author with this email already exists.");
         }
+
+        // No need to hash the password here again since it's already hashed in the RegistrationServlet
+        authorRepository.save(author);
     }
+
+
 
     public void updateAuthor(Author author) {
         if (authorRepository.findById(author.getId()) != null) {
@@ -62,6 +66,7 @@ public class AuthorService {
         }
         return false;
     }
+
 
     public void changeAuthorRole(Long authorId, AuthorRole newRole) {
         System.out.println("Attempting to change role for author ID: " + authorId + " to role: " + newRole);

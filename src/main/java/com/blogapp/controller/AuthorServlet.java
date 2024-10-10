@@ -36,7 +36,8 @@ public class AuthorServlet extends HttpServlet {
         Map<String, Runnable> actionHandlers = new HashMap<>();
         actionHandlers.put("list", () -> listAuthors(request, response));
         actionHandlers.put("changeRole", () -> changeRole(request, response));
-        actionHandlers.put("edit", () -> showEditForm(request, response)); // New handler for edit
+        actionHandlers.put("edit", () -> showEditForm(request, response));
+        actionHandlers.put("create",()->showAddForm(request, response));
         actionHandlers.put(null, () -> listAuthors(request, response));
 
         actionHandlers.getOrDefault(action, () -> {
@@ -188,6 +189,14 @@ public class AuthorServlet extends HttpServlet {
         } catch (Exception e) {
             request.setAttribute("errorMessage", "An unexpected error occurred.");
             listAuthors(request, response);
+        }
+    }
+
+    private void showAddForm(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            request.getRequestDispatcher("/WEB-INF/views/author/addAuthor.jsp").forward(request, response);
+        } catch (ServletException | IOException e) {
+            throw new RuntimeException("Error while showing add author form.", e);
         }
     }
 }

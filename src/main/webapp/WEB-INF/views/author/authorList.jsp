@@ -15,6 +15,14 @@
 <body class="bg-gray-100">
 
 <div class="container mx-auto p-6">
+    <!-- Create Author Button -->
+    <div class="mb-4">
+        <a href="${pageContext.request.contextPath}/author?action=create"
+           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Create Author
+        </a>
+    </div>
+
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table id="authorTable" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
@@ -68,8 +76,6 @@
                 <td class="px-6 py-4 text-right">
                     <a href="${pageContext.request.contextPath}/author?action=edit&id=<%= author.getId() %>">Edit</a>
                 </td>
-
-
                 <td class="px-6 py-4 text-right">
                     <form action="<%= request.getContextPath() %>/author?action=delete" method="post" class="inline">
                         <input type="hidden" name="id" value="<%= author.getId() %>">

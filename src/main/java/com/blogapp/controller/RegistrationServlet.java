@@ -31,6 +31,7 @@ public class RegistrationServlet extends HttpServlet {
         String password = request.getParameter("password");
         String rePassword = request.getParameter("re_pass");
         String birthdateStr = request.getParameter("birthdateStr");
+        String source = request.getParameter("source"); // Get the source parameter
 
         // Check if passwords match
         if (!password.equals(rePassword)) {
@@ -53,13 +54,19 @@ public class RegistrationServlet extends HttpServlet {
         Author author = new Author();
         author.setName(name);
         author.setEmail(email);
-        author.setPassword(hashPassword(password));        author.setBirthdate(birthdate);
+        author.setPassword(hashPassword(password)); // Hash the password here
+        author.setBirthdate(birthdate);
         author.setRole(AuthorRole.Contributor);
 
         // Save the author using the service
         try {
             authorService.addAuthor(author);
-            response.sendRedirect("login.jsp");
+            // Check the source and redirect accordingly
+            if ("addAuthor".equals(source)) {
+                response.sendRedirect("author?action=list"); // Redirect to the author list
+            } else {
+                response.sendRedirect("login.jsp"); // Redirect to the login page for signup
+            }
         } catch (IllegalArgumentException e) {
             request.setAttribute("error", e.getMessage());
             request.getRequestDispatcher("signup.jsp").forward(request, response);
