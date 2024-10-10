@@ -36,6 +36,7 @@ public class AuthorServlet extends HttpServlet {
         Map<String, Runnable> actionHandlers = new HashMap<>();
         actionHandlers.put("list", () -> listAuthors(request, response));
         actionHandlers.put("changeRole", () -> changeRole(request, response));
+        actionHandlers.put("edit", () -> showEditForm(request, response)); // New handler for edit
         actionHandlers.put(null, () -> listAuthors(request, response));
 
         actionHandlers.getOrDefault(action, () -> {
@@ -52,6 +53,17 @@ public class AuthorServlet extends HttpServlet {
             deleteAuthor(request, response);
         } else if ("changeRole".equalsIgnoreCase(action)) {
             changeRole(request, response);
+        } else if ("update".equalsIgnoreCase(action)) { // New condition for update action
+            try {
+                updateAuthor(request);
+                response.sendRedirect(request.getContextPath() + "/author?action=list");
+            } catch (IllegalArgumentException e) {
+                request.setAttribute("errorMessage", e.getMessage());
+                showEditForm(request, response); // Show the edit form in case of error
+            } catch (Exception e) {
+                request.setAttribute("errorMessage", "An unexpected error occurred. Please try again.");
+                showEditForm(request, response); // Show the edit form in case of unexpected error
+            }
         } else {
             try {
                 Long authorId = Long.valueOf(request.getParameter("authorId"));
@@ -68,7 +80,6 @@ public class AuthorServlet extends HttpServlet {
             }
         }
     }
-
     private void listAuthors(HttpServletRequest request, HttpServletResponse response) {
         List<Author> authors = authorService.getAllAuthors();
         request.setAttribute("authors", authors);
@@ -100,13 +111,12 @@ public class AuthorServlet extends HttpServlet {
     }
 
     private void updateAuthor(HttpServletRequest request) {
-        Long id = Long.parseLong(request.getParameter("id"));
+        Long id = Long.parseLong(request.getParameter("authorId")); // Use the parameter from the form
         Author author = authorService.getAuthorById(id);
 
         if (author != null) {
             author.setName(request.getParameter("name"));
             author.setEmail(request.getParameter("email"));
-            author.setPassword(request.getParameter("password"));
 
             String birthdateStr = request.getParameter("birthdate");
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -117,13 +127,11 @@ public class AuthorServlet extends HttpServlet {
                 throw new IllegalArgumentException("Invalid birthdate format. Please use yyyy-MM-dd.");
             }
 
-            setAuthorRole(request, author);
             authorService.updateAuthor(author);
         } else {
             throw new IllegalArgumentException("Author not found for the given ID.");
         }
     }
-
     private void deleteAuthor(HttpServletRequest request, HttpServletResponse response) {
         try {
             Long id = Long.parseLong(request.getParameter("id"));
@@ -158,6 +166,28 @@ public class AuthorServlet extends HttpServlet {
             author.setRole(role);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid role. Allowed values are Contributor, Editor.");
+        }
+    }
+
+    private void showEditForm(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            Long authorId = Long.parseLong(request.getParameter("id"));
+            Author author = authorService.getAuthorById(authorId);
+
+            if (author != null) {
+                request.setAttribute("author", author);
+                request.setAttribute("authorRoles", AuthorRole.values()); // Ensure this is set
+                request.getRequestDispatcher("/WEB-INF/views/author/edit.jsp").forward(request, response);
+            } else {
+                request.setAttribute("errorMessage", "Author not found.");
+                listAuthors(request, response);
+            }
+        } catch (NumberFormatException e) {
+            request.setAttribute("errorMessage", "Invalid author ID.");
+            listAuthors(request, response);
+        } catch (Exception e) {
+            request.setAttribute("errorMessage", "An unexpected error occurred.");
+            listAuthors(request, response);
         }
     }
 }

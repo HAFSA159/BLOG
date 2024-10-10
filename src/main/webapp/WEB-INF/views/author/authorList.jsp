@@ -66,8 +66,9 @@
                     </form>
                 </td>
                 <td class="px-6 py-4 text-right">
-                    <a href="editAuthor.jsp?id=<%= author.getId() %>" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                    <a href="${pageContext.request.contextPath}/author?action=edit&id=<%= author.getId() %>">Edit</a>
                 </td>
+
 
                 <td class="px-6 py-4 text-right">
                     <form action="<%= request.getContextPath() %>/author?action=delete" method="post" class="inline">
