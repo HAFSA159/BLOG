@@ -32,6 +32,7 @@ public class RegistrationServlet extends HttpServlet {
         String rePassword = request.getParameter("re_pass");
         String birthdateStr = request.getParameter("birthdateStr");
         String source = request.getParameter("source"); // Get the source parameter
+        String roleStr = request.getParameter("role"); // Get the role parameter
 
         // Check if passwords match
         if (!password.equals(rePassword)) {
@@ -56,7 +57,21 @@ public class RegistrationServlet extends HttpServlet {
         author.setEmail(email);
         author.setPassword(hashPassword(password)); // Hash the password here
         author.setBirthdate(birthdate);
-        author.setRole(AuthorRole.Contributor);
+
+        // Set the author role. If no role is specified, default to Contributor.
+        AuthorRole role;
+        if (roleStr == null || roleStr.isEmpty()) {
+            role = AuthorRole.Contributor;
+        } else {
+            try {
+                role = AuthorRole.valueOf(roleStr);
+            } catch (IllegalArgumentException e) {
+                request.setAttribute("error", "Invalid role selected!");
+                request.getRequestDispatcher("signup.jsp").forward(request, response);
+                return;
+            }
+        }
+        author.setRole(role);
 
         // Save the author using the service
         try {

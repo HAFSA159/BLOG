@@ -46,10 +46,11 @@
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="role">Role:</label>
             <select name="role" id="role" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                <option value="CONTRIBUTOR">Contributor</option>
-                <option value="EDITOR">Editor</option>
+                <option value="Contributor">Contributor</option> <!-- Match the enum name -->
+                <option value="Editor">Editor</option>          <!-- Match the enum name -->
             </select>
         </div>
+
 
         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Add Author</button>
         <a href="${pageContext.request.contextPath}/author?action=list" class="text-blue-600 hover:text-blue-800 mt-4 inline-block">Back to Author List</a>
