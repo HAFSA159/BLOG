@@ -14,10 +14,14 @@ import com.blogapp.util.HibernateUtil;
 
 public class ArticleRepositoryImpl implements ArticleRepository {
     private static final Logger logger = LoggerConfig.getLogger(ArticleRepositoryImpl.class);
-    private final EntityManager entityManager;
+    private EntityManager entityManager;
     public ArticleRepositoryImpl() {
         this.entityManager = HibernateUtil.getEntityManager();
         logger.info("ArticleRepositoryImpl initialized with EntityManager");
+    }
+
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     @Override
