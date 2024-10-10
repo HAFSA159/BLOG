@@ -56,6 +56,9 @@ public class ArticleServlet extends HttpServlet {
             case "/edit":
                 showEditForm(request, response);
                 break;
+            case "/delete":
+                deleteArticle(request, response);
+                break;
             default:
                 logger.warn("Unknown action: {}", action);
                 listArticles(request, response);
@@ -172,8 +175,14 @@ public class ArticleServlet extends HttpServlet {
     private void deleteArticle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Long id = Long.parseLong(request.getParameter("id"));
         logger.info("Deleting article with ID: {}", id);
-        articleService.deleteArticle(id);
-        logger.info("Article deleted successfully - ID: {}", id);
-        response.sendRedirect(request.getContextPath() + "/article/list");
+        try {
+            articleService.deleteArticle(id);
+            logger.info("Article deleted successfully - ID: {}", id);
+            response.sendRedirect(request.getContextPath() + "/article/list");
+        } catch (Exception e) {
+            logger.error("Error deleting article: {}", e.getMessage(), e);
+            request.setAttribute("error", "An error occurred while deleting the article: " + e.getMessage());
+            listArticles(request, response);
+        }
     }
 }
