@@ -1,3 +1,10 @@
+<%
+	// Check if the session attribute "loggedInUser" is set
+	if (session.getAttribute("loggedInUser") != null) {
+		response.sendRedirect("index.jsp"); // Redirect to index or home page if logged in
+		return; // Ensure no further processing happens after redirect
+	}
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>

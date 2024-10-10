@@ -112,13 +112,22 @@ public class ArticleServlet extends HttpServlet {
     private void showEditForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Long id = Long.parseLong(request.getParameter("id"));
         Article article = articleService.getArticleById(id);
+
+        // Define offset and limit for pagination
+        int offset = 0; // Default offset
+        int limit = 10; // Default limit
+
+        // Get authors using the required parameters
         List<Author> authors = authorService.getAllAuthors();
+
         request.setAttribute("article", article);
         request.setAttribute("authors", authors);
+
         request.getRequestDispatcher("/WEB-INF/views/article/edit.jsp").forward(request, response);
     }
 
- private void createArticle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    private void createArticle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     String title = request.getParameter("title");
     String content = request.getParameter("content");
     Long authorId = Long.parseLong(request.getParameter("authorId"));

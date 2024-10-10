@@ -5,6 +5,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
 import com.blogapp.model.Author;
+import com.blogapp.model.AuthorRole;
 import com.blogapp.repository.AuthorRepository;
 import com.blogapp.util.HibernateUtil;
 
@@ -22,7 +23,8 @@ public class AuthorRepositoryImpl implements AuthorRepository {
 
     @Override
     public List<Author> findAll() {
-        return entityManager.createQuery("FROM Author", Author.class).getResultList();
+        return entityManager.createQuery("FROM Author", Author.class)
+                .getResultList();
     }
 
     @Override
@@ -54,6 +56,31 @@ public class AuthorRepositoryImpl implements AuthorRepository {
             throw new RuntimeException("Failed to update the author", e);
         }
     }
+
+
+    @Override
+    public void updateRole(Long authorId, AuthorRole newRole) { // Use AuthorRole type
+        EntityTransaction transaction = entityManager.getTransaction();
+        try {
+            transaction.begin();
+            Author author = entityManager.find(Author.class, authorId);
+            if (author != null) {
+                author.setRole(newRole); // Update the role
+                entityManager.merge(author); // Persist changes
+                System.out.println("Role updated successfully for author ID: " + authorId); // Debugging line
+            } else {
+                System.out.println("Author not found for ID: " + authorId); // Debugging line
+            }
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+            System.err.println("Failed to update the author's role: " + e.getMessage()); // Error logging
+            throw new RuntimeException("Failed to update the author's role", e);
+        }
+    }
+
 
     @Override
     public void delete(Long id) {
@@ -89,6 +116,4 @@ public class AuthorRepositoryImpl implements AuthorRepository {
             entityManager.close();
         }
     }
-
-
 }

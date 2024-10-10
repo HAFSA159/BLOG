@@ -2,6 +2,7 @@ package com.blogapp.service;
 
 import java.util.List;
 import org.mindrot.jbcrypt.BCrypt;
+import com.blogapp.model.AuthorRole;
 import com.blogapp.model.Author;
 import com.blogapp.repository.AuthorRepository;
 
@@ -16,9 +17,11 @@ public class AuthorService {
         return authorRepository.findById(id);
     }
 
+    // Updated method for pagination
     public List<Author> getAllAuthors() {
         return authorRepository.findAll();
     }
+
 
     public void addAuthor(Author author) {
         if (authorRepository.findByEmail(author.getEmail()) == null) {
@@ -56,6 +59,18 @@ public class AuthorService {
         }
         return false;
     }
+
+    public void changeAuthorRole(Long authorId, AuthorRole newRole) {
+        System.out.println("Attempting to change role for author ID: " + authorId + " to role: " + newRole);
+        Author author = authorRepository.findById(authorId);
+        if (author != null) {
+            authorRepository.updateRole(authorId, newRole);
+            System.out.println("Role changed successfully for author ID: " + authorId);
+        } else {
+            throw new IllegalArgumentException("Author not found for the given ID.");
+        }
+    }
+
 
     public AuthorRepository getAuthorRepository() {
         return authorRepository;
