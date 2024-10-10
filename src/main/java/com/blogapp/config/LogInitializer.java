@@ -1,13 +1,15 @@
 package com.blogapp.config;
 
+import java.io.File;
+import java.nio.file.Paths;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import java.io.File;
-import java.nio.file.Paths;
 
 @WebListener
 public class LogInitializer implements ServletContextListener {

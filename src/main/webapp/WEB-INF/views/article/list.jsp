@@ -57,7 +57,7 @@
                         <td>
                             <a href="<c:url value='/article/view?id=${article.id}'/>" class="btn btn-sm btn-info"><i class="fas fa-eye"></i> View</a>
                             <a href="<c:url value='/article/edit?id=${article.id}'/>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</a>
-                            <a href="<c:url value='/article/delete?id=${article.id}'/>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this article?')"><i class="fas fa-trash-alt"></i> Delete</a>
+                            <a href="<c:url value='/article/delete?id=${article.id}'/>" class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i> Delete</a>
                         </td>
                     </tr>
                 </c:forEach>

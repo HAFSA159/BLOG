@@ -93,6 +93,7 @@ public class ArticleRepositoryImpl implements ArticleRepository {
                 logger.info("Article deleted successfully. ID: {}", id);
             } else {
                 logger.warn("Article not found for deletion. ID: {}", id);
+                throw new IllegalArgumentException("Article not found with ID: " + id);
             }
             transaction.commit();
         } catch (Exception e) {
@@ -100,7 +101,7 @@ public class ArticleRepositoryImpl implements ArticleRepository {
                 transaction.rollback();
             }
             logger.error("Error deleting article: {}", e.getMessage(), e);
-            throw e;
+            throw new RuntimeException("Error deleting article", e);
         }
     }
 
