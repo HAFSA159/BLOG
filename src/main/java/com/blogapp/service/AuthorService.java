@@ -1,8 +1,11 @@
 package com.blogapp.service;
 
 import java.util.List;
+
 import org.mindrot.jbcrypt.BCrypt;
 import com.blogapp.model.AuthorRole;
+
+
 import com.blogapp.model.Author;
 import com.blogapp.repository.AuthorRepository;
 
@@ -74,5 +77,8 @@ public class AuthorService {
 
     public AuthorRepository getAuthorRepository() {
         return authorRepository;
+    }
+    public Author getAuthorByEmail(String email) {
+        return authorRepository.findByEmail(email);
     }
 }

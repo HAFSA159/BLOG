@@ -14,11 +14,9 @@
     <servlet-name>default</servlet-name>
     <url-pattern>/</url-pattern>
 </servlet-mapping>
-
 <listener>
     <listener-class>com.blogapp.config.LogInitializer</listener-class>
 </listener>
-
 <context-param>
     <param-name>log4jConfiguration</param-name>
     <param-value>classpath:log4j2.xml</param-value>
