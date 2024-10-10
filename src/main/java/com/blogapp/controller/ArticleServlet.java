@@ -89,17 +89,17 @@ public class ArticleServlet extends HttpServlet {
         int page = 1;
         int recordsPerPage = 9;
         String searchTitle = request.getParameter("searchTitle");
-        
+
         if (request.getParameter("page") != null) {
             page = Integer.parseInt(request.getParameter("page"));
         }
-        
+
         logger.debug("Listing articles - Page: {}, SearchTitle: {}", page, searchTitle);
-        
+
         List<Article> articles = articleService.getAllArticles((page - 1) * recordsPerPage, recordsPerPage, searchTitle);
         int noOfRecords = articleService.getNoOfRecords(searchTitle);
         int noOfPages = (int) Math.ceil(noOfRecords * 1.0 / recordsPerPage);
-        
+
         request.setAttribute("articles", articles);
         request.setAttribute("noOfPages", noOfPages);
         request.setAttribute("currentPage", page);
@@ -126,25 +126,11 @@ public class ArticleServlet extends HttpServlet {
         Long id = Long.parseLong(request.getParameter("id"));
         logger.debug("Showing edit form for article with ID: {}", id);
         Article article = articleService.getArticleById(id);
-
-        // Define offset and limit for pagination
-        int offset = 0; // Default offset
-        int limit = 10; // Default limit
-
-        // Get authors using the required parameters
         List<Author> authors = authorService.getAllAuthors();
-
         request.setAttribute("article", article);
         request.setAttribute("authors", authors);
-
         request.getRequestDispatcher("/WEB-INF/views/article/edit.jsp").forward(request, response);
     }
-
-
-    private void createArticle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    String title = request.getParameter("title");
-    String content = request.getParameter("content");
-    Long authorId = Long.parseLong(request.getParameter("authorId"));
 
     private void createArticle(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String title = request.getParameter("title");
@@ -190,5 +176,4 @@ public class ArticleServlet extends HttpServlet {
         logger.info("Article deleted successfully - ID: {}", id);
         response.sendRedirect(request.getContextPath() + "/article/list");
     }
-}
 }
