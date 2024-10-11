@@ -81,31 +81,37 @@ public class CommentServlet extends HttpServlet {
         Long articleId = Long.parseLong(request.getParameter("articleId"));
         String content = request.getParameter("content");
         String authorEmail = (String) request.getSession().getAttribute("loggedInUser");
-    
+
         if (authorEmail == null) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User is not authenticated.");
             return;
         }
-    
+
         Author author = authorService.getAuthorByEmail(authorEmail);
         if (author == null) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not found.");
             return;
         }
-    
+
         Comment newComment = new Comment();
         newComment.setContent(content);
         newComment.setArticle(articleService.getArticleById(articleId));
         newComment.setAuthor(author);
         newComment.setCreationDate(LocalDateTime.now());
         newComment.setStatus(CommentStatus.approved);
-    
+
         try {
             logger.info("Attempting to add comment: {}", newComment);
             commentService.addComment(newComment);
             logger.info("Comment added successfully");
-            
-            response.sendRedirect(request.getContextPath() + "/article/view?id=" + articleId);
+
+            // Refresh the article data
+            Article updatedArticle = articleService.getArticleById(articleId);
+            List<Comment> updatedComments = commentService.getAllCommentsByArticleId(articleId);
+            updatedArticle.setComments(updatedComments);
+
+            request.setAttribute("article", updatedArticle);
+            request.getRequestDispatcher("/WEB-INF/views/article/view.jsp").forward(request, response);
         } catch (Exception e) {
             logger.error("Error creating comment: {}", e.getMessage(), e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred while adding the comment: " + e.getMessage());
@@ -116,17 +122,17 @@ public class CommentServlet extends HttpServlet {
         Long commentId = Long.parseLong(request.getParameter("commentId"));
         String content = request.getParameter("content");
         String authorEmail = (String) request.getSession().getAttribute("loggedInUser");
-    
+
         Comment comment = commentService.getCommentById(commentId);
         if (comment == null || !comment.getAuthor().getEmail().equals(authorEmail)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not authorized to edit this comment.");
             return;
         }
-    
+
         comment.setContent(content);
         comment.setStatus(CommentStatus.approved);
         commentService.updateComment(comment);
-    
+
         String referer = request.getHeader("Referer");
         if (referer != null && referer.contains("/article/view")) {
             // If the request came from the article view page, redirect back there
@@ -144,15 +150,15 @@ public class CommentServlet extends HttpServlet {
     private void deleteComment(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Long commentId = Long.parseLong(request.getParameter("commentId"));
         String authorEmail = (String) request.getSession().getAttribute("loggedInUser");
-    
+
         Comment comment = commentService.getCommentById(commentId);
         if (comment == null || !comment.getAuthor().getEmail().equals(authorEmail)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not authorized to delete this comment.");
             return;
         }
-    
+
         commentService.deleteComment(commentId);
-    
+
         String referer = request.getHeader("Referer");
         if (referer != null && referer.contains("/article/view")) {
             // If the request came from the article view page, redirect back there
@@ -178,14 +184,21 @@ public class CommentServlet extends HttpServlet {
         commentService.updateCommentStatus(commentId, status);
 
         String referer = request.getHeader("Referer");
-        response.sendRedirect(referer != null ? referer : request.getContextPath() + "/article/list");
+        if (referer != null && referer.contains("/article/view")) {
+            // If the request came from the article view page, redirect back there
+            Long articleId = commentService.getCommentById(commentId).getArticle().getId();
+            response.sendRedirect(referer != null ? referer : request.getContextPath() + "/article/view?id=" + articleId);
+        } else {
+            // Otherwise, redirect to the comment list page
+            response.sendRedirect(request.getContextPath() + "/comment/list");
+        }
     }
 
     private void listComments(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         String loggedInUser = (String) session.getAttribute("loggedInUser");
         String userRole = (String) session.getAttribute("userRole");
-    
+
         List<Comment> comments;
         try {
             if ("Editor".equals(userRole)) {

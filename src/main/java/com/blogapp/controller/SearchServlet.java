@@ -13,7 +13,7 @@ import com.blogapp.model.Article;
 import com.blogapp.repository.impl.ArticleRepositoryImpl;
 import com.blogapp.service.ArticleService;
 
-@WebServlet(name = "SearchServlet", urlPatterns = {"", "/search"})
+@WebServlet(name = "SearchServlet", urlPatterns = {"", "/home", "/search"})
 public class SearchServlet extends HttpServlet {
 
     private ArticleService articleService;
@@ -51,6 +51,6 @@ public class SearchServlet extends HttpServlet {
         request.setAttribute("noOfPages", noOfPages);
         request.setAttribute("currentPage", page);
         request.setAttribute("query", query);
-        request.getRequestDispatcher("/index.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/home.jsp").forward(request, response);
     }
 }
