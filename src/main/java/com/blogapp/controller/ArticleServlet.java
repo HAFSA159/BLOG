@@ -222,7 +222,7 @@ public class ArticleServlet extends HttpServlet {
         newArticle.setContent(content);
         newArticle.setAuthor(author);
         newArticle.setCreationDate(LocalDateTime.now());
-        newArticle.setStatus(ArticleStatus.valueOf(status.toUpperCase()));
+        newArticle.setStatus(ArticleStatus.valueOf(status.toLowerCase()));
 
         try {
             // Handle image upload
