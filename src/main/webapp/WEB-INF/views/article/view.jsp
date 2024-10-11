@@ -64,41 +64,66 @@ uri="http://java.sun.com/jsp/jstl/core" %>
           >
         </div>
       </div>
-      <div class="mt-5">
-        <h2>Comments</h2>
-        <c:if test="${sessionScope.userRole eq 'Editor'}">
-          <a href="<c:url value='/comment/manage'/>" class="btn btn-primary mb-3">Manage Comments</a>
-        </c:if>
-        <form action="${pageContext.request.contextPath}/comment/create" method="post" id="addCommentForm">
-          <input type="hidden" name="articleId" value="${article.id}">
-          <div class="form-group">
-            <label for="content">Add a comment:</label>
-            <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+      <h3 class="mt-4">Comments</h3>
+      <c:forEach var="comment" items="${article.comments}">
+        <div class="card mt-3">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-muted">By ${comment.author.name}</h6>
+            <p class="card-text">${comment.content}</p>
+            <p class="card-text"><small class="text-muted">Status: ${comment.status}</small></p>
+            <c:if test="${comment.author.email eq sessionScope.loggedInUser}">
+              <button class="btn btn-sm btn-primary" onclick="editComment(${comment.id}, '${comment.content}')">Edit</button>
+              <form action="${pageContext.request.contextPath}/comment/delete" method="post" style="display: inline;">
+                <input type="hidden" name="commentId" value="${comment.id}">
+                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+              </form>
+            </c:if>
+            <c:if test="${sessionScope.userRole eq 'EDITOR' or sessionScope.userRole eq 'ADMIN'}">
+              <form action="${pageContext.request.contextPath}/comment/updateStatus" method="post" style="display: inline;">
+                <input type="hidden" name="commentId" value="${comment.id}">
+                <select name="status" onchange="this.form.submit()">
+                  <option value="approved" ${comment.status eq 'approved' ? 'selected' : ''}>Approved</option>
+                  <option value="rejected" ${comment.status eq 'rejected' ? 'selected' : ''}>Rejected</option>
+                </select>
+              </form>
+            </c:if>
           </div>
-          <button type="submit" class="btn btn-primary">Submit Comment</button>
-        </form>
-        <c:forEach var="comment" items="${article.comments}">
-          <div class="card mt-3">
-            <div class="card-body">
-              <h6 class="card-subtitle mb-2 text-muted">By ${comment.author.name}</h6>
-              <p class="card-text">${comment.content}</p>
-              <p class="card-text"><small class="text-muted">Status: ${comment.status}</small></p>
-              <c:if test="${sessionScope.userRole eq 'ADMIN'}">
-                <form action="${pageContext.request.contextPath}/comment/updateStatus" method="post" style="display: inline;">
-                  <input type="hidden" name="id" value="${comment.id}">
-                  <input type="hidden" name="articleId" value="${article.id}">
-                  <c:if test="${comment.status ne 'approved'}">
-                    <button type="submit" name="status" value="approved" class="btn btn-sm btn-success">Approve</button>
-                  </c:if>
-                  <c:if test="${comment.status ne 'rejected'}">
-                    <button type="submit" name="status" value="rejected" class="btn btn-sm btn-danger">Reject</button>
-                  </c:if>
-                </form>
-              </c:if>
-            </div>
-          </div>
-        </c:forEach>
-      </div>
+        </div>
+      </c:forEach>
+      <form action="${pageContext.request.contextPath}/comment/create" method="post" id="addCommentForm" class="mt-4">
+        <input type="hidden" name="articleId" value="${article.id}">
+        <div class="form-group">
+          <label for="content">Add a comment:</label>
+          <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Comment</button>
+      </form>
+
+      <script>
+        function editComment(commentId, content) {
+          const newContent = prompt("Edit your comment:", content);
+          if (newContent !== null && newContent !== "") {
+            const form = document.createElement("form");
+            form.method = "post";
+            form.action = "${pageContext.request.contextPath}/comment/edit";
+            
+            const commentIdInput = document.createElement("input");
+            commentIdInput.type = "hidden";
+            commentIdInput.name = "commentId";
+            commentIdInput.value = commentId;
+            form.appendChild(commentIdInput);
+
+            const contentInput = document.createElement("input");
+            contentInput.type = "hidden";
+            contentInput.name = "content";
+            contentInput.value = newContent;
+            form.appendChild(contentInput);
+
+            document.body.appendChild(form);
+            form.submit();
+          }
+        }
+      </script>
     </div>
   </body>
 </html>

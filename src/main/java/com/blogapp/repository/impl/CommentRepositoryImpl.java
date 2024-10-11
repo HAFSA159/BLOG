@@ -25,22 +25,11 @@ public class CommentRepositoryImpl implements CommentRepository {
     }
 
     @Override
-    public List<Comment> findAll() {
-        logger.debug("Finding all comments");
-        String jpql = "FROM Comment c ORDER BY c.creationDate DESC";
-        List<Comment> comments = entityManager.createQuery(jpql, Comment.class).getResultList();
-        logger.debug("Query executed. Number of comments found: {}", comments.size());
-        return comments;
-    }
-
-    @Override
-    public List<Comment> findAllByArticleId(Long articleId, int offset, int limit) {
-        logger.debug("Finding comments for article ID: {} - offset: {}, limit: {}", articleId, offset, limit);
+    public List<Comment> findAllByArticleId(Long articleId) {
+        logger.debug("Finding comments for article ID: {}", articleId);
         String jpql = "FROM Comment c WHERE c.article.id = :articleId ORDER BY c.creationDate DESC";
         List<Comment> comments = entityManager.createQuery(jpql, Comment.class)
                 .setParameter("articleId", articleId)
-                .setFirstResult(offset)
-                .setMaxResults(limit)
                 .getResultList();
         logger.debug("Query executed. Number of comments found: {}", comments.size());
         return comments;
@@ -69,23 +58,25 @@ public class CommentRepositoryImpl implements CommentRepository {
             throw e;
         }
     }
+
     @Override
     public void update(Comment comment) {
-        EntityManager em = HibernateUtil.getEntityManager();
-        EntityTransaction transaction = em.getTransaction();
+        logger.info("Updating comment ID: {}", comment.getId());
+        EntityTransaction transaction = entityManager.getTransaction();
         try {
             transaction.begin();
-            em.merge(comment);
+            entityManager.merge(comment);
             transaction.commit();
+            logger.info("Comment updated successfully. ID: {}", comment.getId());
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
+            logger.error("Error updating comment: {}", e.getMessage(), e);
             throw e;
-        } finally {
-            em.close();
         }
     }
+
     @Override
     public void delete(Long id) {
         logger.info("Deleting comment ID: {}", id);
@@ -106,25 +97,6 @@ public class CommentRepositoryImpl implements CommentRepository {
             }
             logger.error("Error deleting comment: {}", e.getMessage(), e);
             throw e;
-        }
-    }
-
-    @Override
-    public int getNoOfRecords(Long articleId) {
-        logger.debug("Getting number of comments for article ID: {}", articleId);
-        String jpql = "SELECT COUNT(c) FROM Comment c WHERE c.article.id = :articleId";
-        int count = entityManager.createQuery(jpql, Long.class)
-                .setParameter("articleId", articleId)
-                .getSingleResult()
-                .intValue();
-        logger.debug("Number of comments found: {}", count);
-        return count;
-    }
-
-    public void close() {
-        logger.info("Closing EntityManager");
-        if (entityManager != null && entityManager.isOpen()) {
-            entityManager.close();
         }
     }
 }
