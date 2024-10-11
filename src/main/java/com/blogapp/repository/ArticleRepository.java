@@ -11,4 +11,6 @@ public interface ArticleRepository {
     void update(Article article);
     void delete(Long id);
     int getNoOfRecords(String searchTitle);
+    List<Article> getArticlesByAuthorEmail(String authorEmail, int offset, int limit, String searchTitle);
+    int getNumberOfRecordsByAuthorEmail(String authorEmail, String searchTitle);
 }

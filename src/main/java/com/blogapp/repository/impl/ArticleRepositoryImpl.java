@@ -44,7 +44,38 @@ public class ArticleRepositoryImpl implements ArticleRepository {
         logger.debug("Query executed. Number of articles found: {}", articles.size());
         return articles;
     }
-
+    @Override
+    public List<Article> getArticlesByAuthorEmail(String authorEmail, int offset, int limit, String searchTitle) {
+        logger.debug("Finding articles by author email: {} - offset: {}, limit: {}, searchTitle: {}", authorEmail, offset, limit, searchTitle);
+        String jpql = "SELECT a FROM Article a JOIN a.author au WHERE au.email = :authorEmail " +
+                      "AND (:searchTitle IS NULL OR a.title LIKE :searchTitle) " +
+                      "ORDER BY a.creationDate DESC";
+        
+        List<Article> articles = entityManager.createQuery(jpql, Article.class)
+                .setParameter("authorEmail", authorEmail)
+                .setParameter("searchTitle", searchTitle == null ? null : "%" + searchTitle + "%")
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+        
+        logger.debug("Query executed. Number of articles found: {}", articles.size());
+        return articles;
+    }
+    
+    @Override
+    public int getNumberOfRecordsByAuthorEmail(String authorEmail, String searchTitle) {
+        logger.debug("Getting number of records by author email: {}. SearchTitle: {}", authorEmail, searchTitle);
+        String jpql = "SELECT COUNT(a) FROM Article a JOIN a.author au WHERE au.email = :authorEmail " +
+                      "AND (:searchTitle IS NULL OR a.title LIKE :searchTitle)";
+        
+        Long count = entityManager.createQuery(jpql, Long.class)
+                .setParameter("authorEmail", authorEmail)
+                .setParameter("searchTitle", searchTitle == null ? null : "%" + searchTitle + "%")
+                .getSingleResult();
+        
+        logger.debug("Number of records found: {}", count);
+        return count.intValue();
+    }
     @Override
     public void save(Article article) {
         logger.info("Saving new article: {}", article.getTitle());

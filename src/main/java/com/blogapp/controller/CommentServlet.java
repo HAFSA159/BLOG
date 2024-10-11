@@ -109,16 +109,15 @@ public class CommentServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not authorized to edit this comment.");
             return;
         }
-
+    
         comment.setContent(content);
         comment.setStatus(CommentStatus.approved);
         commentService.updateComment(comment);
-
+    
         // Fetch the updated article with fresh comments
         Article updatedArticle = articleService.getArticleById(comment.getArticle().getId());
         List<Comment> updatedComments = commentService.getAllCommentsByArticleId(updatedArticle.getId());
         updatedArticle.setComments(updatedComments);
-
         request.setAttribute("article", updatedArticle);
         request.getRequestDispatcher("/WEB-INF/views/article/view.jsp").forward(request, response);
     }
