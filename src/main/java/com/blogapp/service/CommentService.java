@@ -17,10 +17,9 @@ public class CommentService {
         this.commentRepository = commentRepository;
     }
 
-    public List<Comment> getAllCommentsByArticleId(Long articleId, int page, int pageSize) {
-        logger.info("Getting all comments for article ID: {} - Page: {}, PageSize: {}", articleId, page, pageSize);
-        int offset = (page - 1) * pageSize;
-        return commentRepository.findAllByArticleId(articleId, offset, pageSize);
+    public List<Comment> getAllCommentsByArticleId(Long articleId) {
+        logger.info("Getting all comments for article ID: {}", articleId);
+        return commentRepository.findAllByArticleId(articleId);
     }
 
     public Comment getCommentById(Long id) {
@@ -33,22 +32,18 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
+    public void updateComment(Comment comment) {
+        logger.info("Updating comment ID: {}", comment.getId());
+        commentRepository.update(comment);
+    }
 
     public void deleteComment(Long id) {
         logger.info("Deleting comment ID: {}", id);
         commentRepository.delete(id);
     }
 
-    public int getNoOfRecords(Long articleId) {
-        logger.info("Getting number of comments for article ID: {}", articleId);
-        return commentRepository.getNoOfRecords(articleId);
-    }
-
-    public List<Comment> getAllComments() {
-        logger.info("Getting all comments");
-        return commentRepository.findAll();
-    }
     public void updateCommentStatus(Long id, CommentStatus status) {
+        logger.info("Updating status of comment ID: {} to {}", id, status);
         Comment comment = commentRepository.findById(id);
         if (comment != null) {
             comment.setStatus(status);
