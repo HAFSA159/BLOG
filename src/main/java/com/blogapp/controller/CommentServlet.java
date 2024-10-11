@@ -68,30 +68,30 @@ public class CommentServlet extends HttpServlet {
         Long articleId = Long.parseLong(request.getParameter("articleId"));
         String content = request.getParameter("content");
         String authorEmail = (String) request.getSession().getAttribute("loggedInUser");
-    
+
         if (authorEmail == null) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User is not authenticated.");
             return;
         }
-    
+
         Author author = authorService.getAuthorByEmail(authorEmail);
         if (author == null) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not found.");
             return;
         }
-    
+
         Comment newComment = new Comment();
         newComment.setContent(content);
         newComment.setArticle(articleService.getArticleById(articleId));
         newComment.setAuthor(author);
         newComment.setCreationDate(LocalDateTime.now());
         newComment.setStatus(CommentStatus.approved);
-    
+
         try {
             logger.info("Attempting to add comment: {}", newComment);
             commentService.addComment(newComment);
             logger.info("Comment added successfully");
-            
+
             response.sendRedirect(request.getContextPath() + "/article/view?id=" + articleId);
         } catch (Exception e) {
             logger.error("Error creating comment: {}", e.getMessage(), e);
@@ -103,7 +103,7 @@ public class CommentServlet extends HttpServlet {
         Long commentId = Long.parseLong(request.getParameter("commentId"));
         String content = request.getParameter("content");
         String authorEmail = (String) request.getSession().getAttribute("loggedInUser");
-    
+
         Comment comment = commentService.getCommentById(commentId);
         if (comment == null || !comment.getAuthor().getEmail().equals(authorEmail)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not authorized to edit this comment.");
@@ -118,7 +118,6 @@ public class CommentServlet extends HttpServlet {
         Article updatedArticle = articleService.getArticleById(comment.getArticle().getId());
         List<Comment> updatedComments = commentService.getAllCommentsByArticleId(updatedArticle.getId());
         updatedArticle.setComments(updatedComments);
-    
         request.setAttribute("article", updatedArticle);
         request.getRequestDispatcher("/WEB-INF/views/article/view.jsp").forward(request, response);
     }

@@ -6,8 +6,8 @@
   }
 %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8"%> <%@ taglib prefix="c"
-uri="http://java.sun.com/jsp/jstl/core" %>
+         pageEncoding="UTF-8"%> <%@ taglib prefix="c"
+                                           uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -125,5 +125,41 @@ uri="http://java.sun.com/jsp/jstl/core" %>
         }
       </script>
     </div>
-  </body>
+  </c:forEach>
+  <form action="${pageContext.request.contextPath}/comment/create" method="post" id="addCommentForm" class="mt-4">
+    <input type="hidden" name="articleId" value="${article.id}">
+    <div class="form-group">
+      <label for="content">Add a comment:</label>
+      <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Comment</button>
+  </form>
+
+  <script>
+    function editComment(commentId, content) {
+      const newContent = prompt("Edit your comment:", content);
+      if (newContent !== null && newContent !== "") {
+        const form = document.createElement("form");
+        form.method = "post";
+        form.action = "${pageContext.request.contextPath}/comment/edit";
+
+        const commentIdInput = document.createElement("input");
+        commentIdInput.type = "hidden";
+        commentIdInput.name = "commentId";
+        commentIdInput.value = commentId;
+        form.appendChild(commentIdInput);
+
+        const contentInput = document.createElement("input");
+        contentInput.type = "hidden";
+        contentInput.name = "content";
+        contentInput.value = newContent;
+        form.appendChild(contentInput);
+
+        document.body.appendChild(form);
+        form.submit();
+      }
+    }
+  </script>
+</div>
+</body>
 </html>
