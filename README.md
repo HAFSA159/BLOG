@@ -36,7 +36,7 @@ Cette application web est une extension interactive et participative d'une solut
 
 - **Article** : `titre`, `contenu`, `dateCreation`, `datePublication`, `statut` (*Enum*: brouillon, publié), `auteur`.
 - **Commentaire** : `contenu`, `dateCreation`, `article`, `statut` (*Enum*: approuvé, rejeté).
-- **Auteur** : `nom`, `prenom`, `email`, `dateNaissance`, `role` (*Enum*: Contributeur, Éditeur).
+- **Auteur** : `nom`, `email`, `password`, `dateNaissance`, `role` (*Enum*: Contributeur, Éditeur).
 
 ## Technologies Utilisées
 
@@ -86,12 +86,57 @@ Cette application web est une extension interactive et participative d'une solut
 
 Le projet est organisé de manière modulaire et suit une architecture en couches :
 
-1. **Présentation** : Vue dynamique à l’aide de JSP et JSTL.
+1. **Présentation** : Vue dynamique à l'aide de JSP et JSTL.
 2. **Contrôleur** : Gère la navigation et les requêtes utilisateur (Servlets).
 3. **Service** : Contient la logique métier.
-4. **DAO (Data Access Object)** : Accès aux données via Hibernate.
+4. **Model** : Représente les entités de données et la logique de domaine.
 5. **Repository** : Gestion des opérations CRUD.
 6. **Utilitaires** : Fonctions diverses comme les **Logger**, les **Utilitaires de Date**, etc.
+
+## 📊 Diagrammes UML
+
+### Diagramme de Classes
+![Diagramme de Classes UML](src\main\webapp\assets\img\DiagCase.PNG)
+
+Ce diagramme illustre la structure des classes principales de notre application, montrant les relations entre Article, Commentaire, et Auteur.
+
+### Diagramme de Séquence
+![Diagramme de Séquence UML](src\main\webapp\assets\img\DiagClass.PNG)
+
+Ce diagramme montre la séquence d'interactions entre les différentes couches de l'application lors de l'ajout d'un nouvel article.
+
+## 🎨 Maquettes Figma
+
+### Page d'Accueil
+![Maquette Figma - Page d'Accueil](src/main/webapp/assets/img/home.PNG)
+
+Cette maquette présente la conception de notre page d'accueil, mettant en évidence les derniers articles et les fonctionnalités principales.
+
+### Interface de Gestion des Auteurs
+![Maquette Figma - Gestion des Auteurs](src/main/webapp/assets/img/dashboard.PNG)
+
+Cette maquette montre l'interface utilisateur pour la création et la modification d'Auteurs.
+
+### Page d'Inscription (Signup)
+![Maquette Figma - Page d'Inscription](src/main/webapp/assets/img/Signup.PNG)
+
+Cette maquette illustre l'interface d'inscription pour les nouveaux utilisateurs, permettant la création de comptes auteur.
+
+### Page de Connexion (Signin)
+![Maquette Figma - Page de Connexion](src/main/webapp/assets/img/Signin.PNG)
+
+Cette maquette présente l'interface de connexion pour les utilisateurs existants, leur permettant d'accéder à leurs comptes.
+
+### Page de Modification du Profil Auteur
+![Maquette Figma - Modification du Profil Auteur](src/main/webapp/assets/img/EditAuthor.PNG)
+
+Cette maquette montre l'interface permettant aux auteurs de modifier leurs informations de profil et leurs préférences.
+## 📅 Gestion de Projet avec JIRA
+
+### Tableau Kanban
+![Tableau Kanban JIRA](src\main\webapp\assets\img\jira.PNG)
+
+Notre tableau Kanban dans JIRA, illustrant la progression des tâches à travers les différentes étapes du développement.
 
 ## Guide d'Installation
 
@@ -103,22 +148,20 @@ Le projet est organisé de manière modulaire et suit une architecture en couche
 2. Importez le projet dans votre IDE Java préféré.
 
 3. Configurez la base de données MySQL :
-    - Créez une base de données nommée `taskmanager`.
-    - Exécutez le script SQL fourni dans le dossier `/sql` pour initialiser les tables.
+   - Créez une base de données nommée `taskmanager`.
+   - Exécutez le script SQL fourni dans le dossier `/sql` pour initialiser les tables.
 
-4. Modifiez le fichier `persistence.xml` avec vos informations de connexion MySQL.
-
-5. Compilez et construisez le projet avec Maven :
+4. Compilez et construisez le projet avec Maven :
     ```bash
     mvn clean install
     ```
 
-6. Déployez le fichier WAR sur Tomcat :
+5. Déployez le fichier WAR sur Tomcat :
     ```bash
     mvn tomcat7:deploy
     ```
 
-7. Accédez à l'application via `http://localhost:8080`.
+6. Accédez à l'application via `http://localhost:8080`.
 
 ## Développement Agile
 
@@ -128,9 +171,9 @@ Le projet a été géré en utilisant la méthodologie **Scrum**. Des sprints on
 
 Les tests ont été créés en utilisant **JUnit** et **Mockito** pour s'assurer que chaque composant fonctionne correctement. Le développement a été guidé par les tests (*Test-Driven Development*).
 
-## Auteur
+## Auteurs
 
-Cette application a été développée par **Wael Boukhari** **Hafsa Elmoatassim Billah** **Naoufal Labrihmi** . 
+Cette application a été développée par **Wael Boukhari**, **Hafsa Elmoatassim Billah**, et **Naoufal Labrihmi**.
 
 ---
 
