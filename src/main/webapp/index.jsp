@@ -10,6 +10,9 @@
         response.sendRedirect("login.jsp");
         return; // Ensure no further processing happens after redirect
     }
+
+    // Get the user's role from the session
+    String userRole = (String) session.getAttribute("userRole");
 %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -51,7 +54,6 @@
         <h1 class="text-4xl font-bold text-white dark:text-yellow-300">Welcome, Our Editor</h1>
         <p class="mt-4 text-lg text-gray-200 dark:text-gray-400">Here's what you can do today:</p>
 
-
         <!-- Navigation Links -->
         <div class="grid grid-cols-2 gap-4 mt-6">
             <a href="<c:url value='/article/list'/>" class="flex items-center gap-4 p-4 bg-indigo-100 text-indigo-800 dark:bg-indigo-800 dark:text-indigo-50 rounded-lg shadow hover:shadow-md">
@@ -66,12 +68,15 @@
                 </svg>
                 <span>Create Article</span>
             </a>
-            <a href="<c:url value='/author/list'/>" class="flex items-center gap-4 p-4 bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-50 rounded-lg shadow hover:shadow-md">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16m-7 5h7" />
-                </svg>
-                <span>View Authors</span>
-            </a>
+            <!-- Show "View Authors" button only if the user role is "Editor" -->
+            <c:if test="${userRole == 'Editor'}">
+                <a href="<c:url value='/author/list'/>" class="flex items-center gap-4 p-4 bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-50 rounded-lg shadow hover:shadow-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16m-7 5h7" />
+                    </svg>
+                    <span>View Authors</span>
+                </a>
+            </c:if>
             <a href="<c:url value='/logout'/>" class="flex items-center gap-4 p-4 bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-50 rounded-lg shadow hover:shadow-md">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H3" />
