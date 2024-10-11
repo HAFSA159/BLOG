@@ -64,15 +64,6 @@
               <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded text-sm">Delete</button>
             </form>
           </c:if>
-          <c:if test="${sessionScope.userRole eq 'Editor'}">
-            <form action="${pageContext.request.contextPath}/comment/updateStatus" method="post" class="inline">
-              <input type="hidden" name="commentId" value="${comment.id}">
-              <select name="status" onchange="this.form.submit()" class="bg-gray-200 rounded px-2 py-1 text-sm">
-                <option value="approved" ${comment.status eq 'approved' ? 'selected' : ''}>Approved</option>
-                <option value="rejected" ${comment.status eq 'rejected' ? 'selected' : ''}>Rejected</option>
-              </select>
-            </form>
-          </c:if>
         </div>
       </c:forEach>
       <form action="${pageContext.request.contextPath}/comment/create" method="post" id="addCommentForm" class="mt-4">

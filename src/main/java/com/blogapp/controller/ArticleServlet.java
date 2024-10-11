@@ -3,6 +3,7 @@ package com.blogapp.controller;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,14 +19,17 @@ import com.blogapp.model.Article;
 import com.blogapp.model.ArticleStatus;
 import com.blogapp.model.Author;
 import com.blogapp.model.Comment;
+import com.blogapp.model.CommentStatus;
 import com.blogapp.repository.impl.ArticleRepositoryImpl;
 import com.blogapp.repository.impl.AuthorRepositoryImpl;
 import com.blogapp.repository.impl.CommentRepositoryImpl;
 import com.blogapp.service.ArticleService;
 import com.blogapp.service.AuthorService;
 import com.blogapp.service.CommentService;
-@WebServlet(name = "ArticleServlet", urlPatterns = { "/article/*" })
+
+@WebServlet(name = "ArticleServlet", urlPatterns = {"/article/*"})
 public class ArticleServlet extends HttpServlet {
+
     private static final Logger logger = LoggerConfig.getLogger(ArticleServlet.class);
     private ArticleService articleService;
     private AuthorService authorService;
@@ -87,7 +91,7 @@ public class ArticleServlet extends HttpServlet {
             case "/edit":
                 updateArticle(request, response);
                 break;
-                case "/delete":
+            case "/delete":
                 deleteArticle(request, response);
                 break;
             default:
@@ -131,22 +135,27 @@ public class ArticleServlet extends HttpServlet {
                 listArticles(request, response, loggedInUser);
                 return;
             }
-            
+
             // Check if the logged-in user is the author of the article
             if (!article.getAuthor().getEmail().equals(loggedInUser)) {
                 request.setAttribute("errorMessage", "You are not authorized to view this article.");
                 listArticles(request, response, loggedInUser);
                 return;
             }
-            
+
             // Fetch the latest comments for the article
-            List<Comment> comments = commentService.getAllCommentsByArticleId(article.getId());
-            article.setComments(comments);
-            
+            List<Comment> allComments = commentService.getAllCommentsByArticleId(article.getId());
+
+            // Filter comments to include only approved ones
+            List<Comment> approvedComments = allComments.stream()
+                    .filter(comment -> comment.getStatus() == CommentStatus.approved)
+                    .collect(Collectors.toList());
+
+            article.setComments(approvedComments);
+
             request.setAttribute("article", article);
-            request.getRequestDispatcher("/WEB-INF/views/article/view.jsp").forward(request, response); 
+            request.getRequestDispatcher("/WEB-INF/views/article/view.jsp").forward(request, response);
         } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "Invalid article ID.");
             request.setAttribute("errorMessage", "Invalid article ID.");
             listArticles(request, response, loggedInUser);
         } catch (Exception e) {
@@ -252,38 +261,38 @@ public class ArticleServlet extends HttpServlet {
     }
 
     private void deleteArticle(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-HttpSession session = request.getSession();
-String loggedInUser = (String) session.getAttribute("loggedInUser");
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        String loggedInUser = (String) session.getAttribute("loggedInUser");
 
-if (loggedInUser == null) {
-    response.sendRedirect(request.getContextPath() + "/login.jsp");
-    return;
-}
+        if (loggedInUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
 
-Long id = Long.parseLong(request.getParameter("id"));
-logger.info("Deleting article with ID: {}", id);
+        Long id = Long.parseLong(request.getParameter("id"));
+        logger.info("Deleting article with ID: {}", id);
 
-try {
-    Article article = articleService.getArticleById(id);
-    if (article == null) {
-        response.sendError(HttpServletResponse.SC_NOT_FOUND, "Article not found");
-        return;
+        try {
+            Article article = articleService.getArticleById(id);
+            if (article == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Article not found");
+                return;
+            }
+
+            // Check if the logged-in user is the author of the article or an admin
+            if (!article.getAuthor().getEmail().equals(loggedInUser)
+                    && !"Editor".equals(session.getAttribute("userRole"))) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not authorized to delete this article");
+                return;
+            }
+
+            articleService.deleteArticle(id);
+            logger.info("Article deleted successfully - ID: {}", id);
+            response.sendRedirect(request.getContextPath() + "/article/list");
+        } catch (Exception e) {
+            logger.error("Error deleting article: {}", e.getMessage(), e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred while deleting the article");
+        }
     }
-
-    // Check if the logged-in user is the author of the article or an admin
-    if (!article.getAuthor().getEmail().equals(loggedInUser) && 
-        !"Editor".equals(session.getAttribute("userRole"))) {
-        response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not authorized to delete this article");
-        return;
-    }
-
-    articleService.deleteArticle(id);
-    logger.info("Article deleted successfully - ID: {}", id);
-    response.sendRedirect(request.getContextPath() + "/article/list");
-} catch (Exception e) {
-    logger.error("Error deleting article: {}", e.getMessage(), e);
-    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred while deleting the article");
-}
-}
 }
