@@ -96,12 +96,12 @@ Le projet est organisé de manière modulaire et suit une architecture en couche
 ## 📊 Diagrammes UML
 
 ### Diagramme de Classes
-![Diagramme de Classes UML](src\main\webapp\assets\img\Diagclasse.PNG)
+![Diagramme de Classes UML](src/main/webapp/assets/img/Diagclasse.PNG)
 
 Ce diagramme illustre la structure des classes principales de notre application, montrant les relations entre Article, Commentaire, et Auteur.
 
 ### Diagramme de Séquence
-![Diagramme de Séquence UML](src\main\webapp\assets\img\Diagcase.PNG)
+![Diagramme de Séquence](src/main/webapp/assets/img/Diagcase.PNG)
 
 Ce diagramme montre la séquence d'interactions entre les différentes couches de l'application lors de l'ajout d'un nouvel article.
 
@@ -134,7 +134,7 @@ Cette maquette montre l'interface permettant aux auteurs de modifier leurs infor
 ## 📅 Gestion de Projet avec JIRA
 
 ### Tableau Kanban
-![Tableau Kanban JIRA](src\main\webapp\assets\img\jira.PNG)
+![Tableau Kanban Jira](src/main/webapp/assets/img/jira.PNG)
 
 Notre tableau Kanban dans JIRA, illustrant la progression des tâches à travers les différentes étapes du développement.
 
