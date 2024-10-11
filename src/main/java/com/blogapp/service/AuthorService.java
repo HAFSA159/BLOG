@@ -3,10 +3,9 @@ package com.blogapp.service;
 import java.util.List;
 
 import org.mindrot.jbcrypt.BCrypt;
-import com.blogapp.model.AuthorRole;
-
 
 import com.blogapp.model.Author;
+import com.blogapp.model.AuthorRole;
 import com.blogapp.repository.AuthorRepository;
 
 public class AuthorService {

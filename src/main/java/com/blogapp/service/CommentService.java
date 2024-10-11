@@ -52,4 +52,13 @@ public class CommentService {
             throw new IllegalArgumentException("Comment not found with id: " + id);
         }
     }
+    public List<Comment> getAllComments() {
+        logger.info("Getting all comments");
+        return commentRepository.findAll();
+    }
+    
+    public List<Comment> getCommentsByAuthorEmail(String email) {
+        logger.info("Getting comments for author email: {}", email);
+        return commentRepository.findByAuthorEmail(email);
+    }
 }

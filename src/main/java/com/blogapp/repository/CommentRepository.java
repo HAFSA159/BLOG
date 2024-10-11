@@ -10,4 +10,6 @@ public interface CommentRepository {
     void save(Comment comment);
     void update(Comment comment);
     void delete(Long id);
+    List<Comment> findAll();
+    List<Comment> findByAuthorEmail(String email);
 }

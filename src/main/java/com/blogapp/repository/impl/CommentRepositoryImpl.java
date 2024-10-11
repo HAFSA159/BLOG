@@ -12,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 import com.blogapp.config.LoggerConfig;
 import com.blogapp.model.Comment;
 import com.blogapp.repository.CommentRepository;
-import com.blogapp.util.HibernateUtil;
 
 public class CommentRepositoryImpl implements CommentRepository {
 
@@ -22,6 +21,22 @@ public class CommentRepositoryImpl implements CommentRepository {
     public CommentRepositoryImpl() {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("blogapp");
         this.entityManager = emf.createEntityManager();
+    }
+
+    @Override
+    public List<Comment> findAll() {
+        logger.debug("Finding all comments");
+        String jpql = "SELECT c FROM Comment c";
+        return entityManager.createQuery(jpql, Comment.class).getResultList();
+    }
+
+    @Override
+    public List<Comment> findByAuthorEmail(String email) {
+        logger.debug("Finding comments by author email: {}", email);
+        String jpql = "SELECT c FROM Comment c WHERE c.author.email = :email";
+        return entityManager.createQuery(jpql, Comment.class)
+                .setParameter("email", email)
+                .getResultList();
     }
 
     @Override

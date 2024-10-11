@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.blogapp.model.AuthorRole;
 import com.blogapp.repository.impl.AuthorRepositoryImpl;
 import com.blogapp.service.AuthorService;
 
@@ -31,6 +32,11 @@ public class LoginServlet extends HttpServlet {
         if (authorService.authenticate(email, password)) {
             HttpSession session = request.getSession();
             session.setAttribute("loggedInUser", email);
+
+            // Fetch the author's role and store it in the session
+            AuthorRole userRole = authorService.getAuthorByEmail(email).getRole();
+            session.setAttribute("userRole", userRole.name());
+
             response.sendRedirect("index.jsp"); // Redirect to index.jsp upon successful login
         } else {
             request.setAttribute("error", "Invalid email or password");

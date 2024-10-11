@@ -2,7 +2,7 @@
 <%@ page language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
-  // Check if the session attribute "loggedInUser" is set
+  // Check if the session attributes "loggedInUser" and "userRole" are set
   if (session.getAttribute("loggedInUser") == null) {
     response.sendRedirect("login.jsp");
     return; // Ensure no further processing happens after redirect
@@ -52,39 +52,89 @@
     </div>
     <div class="mt-5">
       <h2 class="text-xl font-semibold text-white">Comments</h2>
-      <c:if test="${sessionScope.userRole eq 'Editor'}">
-        <a href="<c:url value='/comment/manage'/>" class="btn bg-blue-500 hover:bg-blue-600 text-white mb-3">Manage Comments</a>
-      </c:if>
-      <form action="${pageContext.request.contextPath}/comment/create" method="post" id="addCommentForm" class="mb-5">
-        <input type="hidden" name="articleId" value="${article.id}">
-        <div class="form-group">
-          <label for="content" class="block text-gray-700">Add a comment:</label>
-          <textarea class="form-control border rounded w-full p-2" id="content" name="content" rows="3" required></textarea>
-        </div>
-        <button type="submit" class="btn bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">Submit Comment</button>
-      </form>
       <c:forEach var="comment" items="${article.comments}">
         <div class="bg-gray-50 shadow-md rounded-lg p-4 mt-3">
           <h6 class="text-gray-600">By ${comment.author.name}</h6>
           <p>${comment.content}</p>
           <p class="text-gray-500"><small>Status: ${comment.status}</small></p>
-          <c:if test="${sessionScope.userRole eq 'ADMIN'}">
-            <form action="${pageContext.request.contextPath}/comment/updateStatus" method="post" style="display: inline;">
-              <input type="hidden" name="id" value="${comment.id}">
-              <input type="hidden" name="articleId" value="${article.id}">
-              <c:if test="${comment.status ne 'approved'}">
-                <button type="submit" name="status" value="approved" class="btn btn-sm bg-green-500 hover:bg-green-600 text-white">Approve</button>
-              </c:if>
-              <c:if test="${comment.status ne 'rejected'}">
-                <button type="submit" name="status" value="rejected" class="btn btn-sm bg-red-500 hover:bg-red-600 text-white">Reject</button>
-              </c:if>
+          <c:if test="${comment.author.email eq sessionScope.loggedInUser}">
+            <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded text-sm" onclick="openEditPopup(${comment.id}, '${comment.content}')">Edit</button>
+            <form action="${pageContext.request.contextPath}/comment/delete" method="post" class="inline">
+              <input type="hidden" name="commentId" value="${comment.id}">
+              <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded text-sm">Delete</button>
+            </form>
+          </c:if>
+          <c:if test="${sessionScope.userRole eq 'Editor'}">
+            <form action="${pageContext.request.contextPath}/comment/updateStatus" method="post" class="inline">
+              <input type="hidden" name="commentId" value="${comment.id}">
+              <select name="status" onchange="this.form.submit()" class="bg-gray-200 rounded px-2 py-1 text-sm">
+                <option value="approved" ${comment.status eq 'approved' ? 'selected' : ''}>Approved</option>
+                <option value="rejected" ${comment.status eq 'rejected' ? 'selected' : ''}>Rejected</option>
+              </select>
             </form>
           </c:if>
         </div>
       </c:forEach>
+      <form action="${pageContext.request.contextPath}/comment/create" method="post" id="addCommentForm" class="mt-4">
+        <input type="hidden" name="articleId" value="${article.id}">
+        <div class="mb-4">
+          <label for="content" class="block text-white mb-2">Add a comment:</label>
+          <textarea class="w-full p-2 border rounded" id="content" name="content" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">Submit Comment</button>
+      </form>
     </div>
   </div>
 </div>
+
+<div id="editPopup" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <h3 class="text-lg font-medium leading-6 text-gray-900 mb-2">Edit Comment</h3>
+    <textarea id="editCommentContent" class="w-full p-2 border rounded mb-4" rows="3"></textarea>
+    <div class="flex justify-end">
+      <button onclick="closeEditPopup()" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded mr-2">Cancel</button>
+      <button onclick="submitEditComment()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentCommentId;
+
+  function openEditPopup(commentId, content) {
+    currentCommentId = commentId;
+    document.getElementById('editCommentContent').value = content;
+    document.getElementById('editPopup').classList.remove('hidden');
+  }
+
+  function closeEditPopup() {
+    document.getElementById('editPopup').classList.add('hidden');
+  }
+
+  function submitEditComment() {
+    const newContent = document.getElementById('editCommentContent').value;
+    if (newContent.trim() !== "") {
+      const form = document.createElement("form");
+      form.method = "post";
+      form.action = "${pageContext.request.contextPath}/comment/edit";
+      
+      const commentIdInput = document.createElement("input");
+      commentIdInput.type = "hidden";
+      commentIdInput.name = "commentId";
+      commentIdInput.value = currentCommentId;
+      form.appendChild(commentIdInput);
+
+      const contentInput = document.createElement("input");
+      contentInput.type = "hidden";
+      contentInput.name = "content";
+      contentInput.value = newContent;
+      form.appendChild(contentInput);
+
+      document.body.appendChild(form);
+      form.submit();
+    }
+  }
+</script>
 
 </body>
 </html>

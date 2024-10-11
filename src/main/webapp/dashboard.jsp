@@ -23,6 +23,11 @@
                     View Authors
                 </a>
             </li>
+            <li class="mb-4">
+                <a href="${pageContext.request.contextPath}/comment/list" class="block px-4 py-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-white">
+                    Manage Comments
+                </a>
+            </li>
             <li>
                 <a href="${pageContext.request.contextPath}/logout" class="block px-4 py-2 rounded-lg bg-red-400 hover:bg-red-500 text-white">
                     Log Out
