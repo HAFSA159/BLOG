@@ -51,6 +51,13 @@ public class RegistrationServlet extends HttpServlet {
             return;
         }
 
+        // Check if email already exists
+//        if (authorService.findByEmail(email) != null) {
+//            request.setAttribute("error", "Email is already registered!");
+//            request.getRequestDispatcher("signup.jsp").forward(request, response);
+//            return;
+//        }
+
         // Create new Author object
         Author author = new Author();
         author.setName(name);

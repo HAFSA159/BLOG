@@ -67,6 +67,9 @@ public class AuthorService {
         return false;
     }
 
+    public Author findByEmail(String email) {
+        return authorRepository.findByEmail(email);
+    }
 
     public void changeAuthorRole(Long authorId, AuthorRole newRole) {
         System.out.println("Attempting to change role for author ID: " + authorId + " to role: " + newRole);

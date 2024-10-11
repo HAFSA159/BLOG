@@ -1,0 +1,39 @@
+.blur-bg {
+    background-image: url('/images/back.jpg');
+    background-size: cover;
+    background-position: center;
+    filter: blur(10px);
+    -webkit-filter: blur(10px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+}
+.content {
+    position: relative;
+    z-index: 10;
+}
+.sidebar {
+    background-color: rgba(44, 62, 80, 0.85);
+    backdrop-filter: blur(5px);
+}
+.main-content {
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(5px);
+}
+.table-container {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.btn-primary {
+    background-color: #2563eb;
+    color: #fff;
+    transition: background-color 0.3s ease;
+}
+.btn-primary:hover {
+    background-color: #1d4ed8;
+}

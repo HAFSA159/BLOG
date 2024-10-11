@@ -1,60 +1,104 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Add Author</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .blur-bg {
+            background-image: url('/images/back.jpg');
+            background-size: cover;
+            background-position: center;
+            filter: blur(10px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 0;
+        }
+        .content {
+            position: relative;
+            z-index: 10;
+        }
+        .sidebar {
+            background-color: rgba(44, 62, 80, 0.85);
+            backdrop-filter: blur(5px);
+        }
+        .form-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .btn-primary {
+            background-color: #2563eb;
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-<div class="bg-white p-6 rounded-lg shadow-md w-1/3">
-    <h2 class="text-lg font-bold mb-4">Add New Author</h2>
+<body class="bg-gray-900">
+<div class="blur-bg"></div>
 
-    <c:if test="${not empty error}">
-        <div class="bg-red-500 text-white p-2 rounded mb-4">
-            <c:out value="${error}"/>
+<div class="content flex">
+    <!-- Sidebar -->
+    <%@ include file="/dashboard.jsp" %>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-6 main-content rounded-lg">
+        <h2 class="text-3xl font-semibold italic text-white mb-6">Add New Author</h2>
+
+        <div class="form-container p-8 w-full max-w-lg mx-auto">
+            <form action="${pageContext.request.contextPath}/register" method="post">
+                <input type="hidden" name="source" value="addAuthor" />
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Name:</label>
+                    <input type="text" name="name" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Author Name" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="email">Email:</label>
+                    <input type="email" name="email" id="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Author Email" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password:</label>
+                    <input type="password" name="password" id="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Password" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="re_pass">Confirm Password:</label>
+                    <input type="password" name="re_pass" id="re_pass" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Confirm Password" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="birthdate">Birthdate:</label>
+                    <input type="date" name="birthdateStr" id="birthdate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="role">Role:</label>
+                    <select name="role" id="role" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        <option value="Contributor">Contributor</option>
+                        <option value="Editor">Editor</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <button type="submit" class="btn-primary py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        Add Author
+                    </button>
+                    <a href="${pageContext.request.contextPath}/dashboard" class="text-gray-600 hover:underline">Cancel</a>
+                </div>
+            </form>
         </div>
-    </c:if>
-
-    <form action="${pageContext.request.contextPath}/register" method="post"> <!-- Update action URL -->
-        <input type="hidden" name="source" value="addAuthor" /> <!-- Indicate this form is for adding an author -->
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Name:</label>
-            <input type="text" name="name" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-        </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="email">Email:</label>
-            <input type="email" name="email" id="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-        </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password:</label>
-            <input type="password" name="password" id="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-        </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="re_pass">Confirm Password:</label>
-            <input type="password" name="re_pass" id="re_pass" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-        </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="birthdate">Birthdate:</label>
-            <input type="date" name="birthdateStr" id="birthdate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-        </div>
-
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="role">Role:</label>
-            <select name="role" id="role" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                <option value="Contributor">Contributor</option> <!-- Match the enum name -->
-                <option value="Editor">Editor</option>          <!-- Match the enum name -->
-            </select>
-        </div>
-
-
-        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Add Author</button>
-        <a href="${pageContext.request.contextPath}/author?action=list" class="text-blue-600 hover:text-blue-800 mt-4 inline-block">Back to Author List</a>
-    </form>
+    </div>
 </div>
+
 </body>
 </html>
