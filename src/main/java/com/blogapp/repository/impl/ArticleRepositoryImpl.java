@@ -1,6 +1,7 @@
 package com.blogapp.repository.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -28,6 +29,7 @@ public class ArticleRepositoryImpl implements ArticleRepository {
     }
 
     @Override
+
     public List<Article> getPublishedArticles(int offset, int limit, String searchTitle) {
         String jpql = "SELECT a FROM Article a WHERE a.status = :status";
         if (searchTitle != null && !searchTitle.trim().isEmpty()) {
@@ -65,7 +67,7 @@ public class ArticleRepositoryImpl implements ArticleRepository {
         logger.debug("Finding article by ID: {}", id);
         Article article = entityManager.find(Article.class, id);
         logger.debug("Article found: {}", article != null);
-        return article;
+        return Optional.ofNullable(article);
     }
 
     @Override
@@ -179,12 +181,11 @@ public class ArticleRepositoryImpl implements ArticleRepository {
     public int getNoOfRecords(String searchTitle) {
         logger.debug("Getting number of records. SearchTitle: {}", searchTitle);
         String jpql = "SELECT COUNT(a) FROM Article a WHERE :searchTitle IS NULL OR a.title LIKE :searchTitle";
-        int count = entityManager.createQuery(jpql, Long.class)
+        Long count = entityManager.createQuery(jpql, Long.class)
                 .setParameter("searchTitle", searchTitle == null ? null : "%" + searchTitle + "%")
-                .getSingleResult()
-                .intValue();
+                .getSingleResult();
         logger.debug("Number of records found: {}", count);
-        return count;
+        return count.intValue();
     }
 
     public void close() {

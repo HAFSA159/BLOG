@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Optional;
 
 import org.apache.logging.log4j.Logger;
 
@@ -24,6 +25,7 @@ import com.blogapp.repository.impl.CommentRepositoryImpl;
 import com.blogapp.service.ArticleService;
 import com.blogapp.service.AuthorService;
 import com.blogapp.service.CommentService;
+
 
 @WebServlet(name = "CommentServlet", urlPatterns = {"/comment/*"})
 public class CommentServlet extends HttpServlet {
@@ -93,9 +95,17 @@ public class CommentServlet extends HttpServlet {
             return;
         }
     
+
+        Optional<Article> optionalArticle = articleService.getArticleById(articleId);
+        if (!optionalArticle.isPresent()) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Article not found.");
+            return;
+        }
+    
+        Article article = optionalArticle.get();
         Comment newComment = new Comment();
         newComment.setContent(content);
-        newComment.setArticle(articleService.getArticleById(articleId));
+        newComment.setArticle(article);
         newComment.setAuthor(author);
         newComment.setCreationDate(LocalDateTime.now());
         newComment.setStatus(CommentStatus.approved);
@@ -105,7 +115,6 @@ public class CommentServlet extends HttpServlet {
             commentService.addComment(newComment);
             logger.info("Comment added successfully");
     
-            // Redirect to the article view page
             response.sendRedirect(request.getContextPath() + "/article/view?id=" + articleId);
         } catch (Exception e) {
             logger.error("Error creating comment: {}", e.getMessage(), e);
@@ -117,25 +126,30 @@ public class CommentServlet extends HttpServlet {
         Long commentId = Long.parseLong(request.getParameter("commentId"));
         String content = request.getParameter("content");
         String authorEmail = (String) request.getSession().getAttribute("loggedInUser");
-
+    
         Comment comment = commentService.getCommentById(commentId);
         if (comment == null || !comment.getAuthor().getEmail().equals(authorEmail)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not authorized to edit this comment.");
             return;
         }
-
+    
         comment.setContent(content);
         comment.setStatus(CommentStatus.approved);
         commentService.updateComment(comment);
-
+    
         String referer = request.getHeader("Referer");
         if (referer != null && referer.contains("/article/view")) {
             // If the request came from the article view page, redirect back there
-            Article updatedArticle = articleService.getArticleById(comment.getArticle().getId());
-            List<Comment> updatedComments = commentService.getAllCommentsByArticleId(updatedArticle.getId());
-            updatedArticle.setComments(updatedComments);
-            request.setAttribute("article", updatedArticle);
-            request.getRequestDispatcher("/WEB-INF/views/article/view.jsp").forward(request, response);
+            Optional<Article> updatedArticleOpt = articleService.getArticleById(comment.getArticle().getId());
+            if (updatedArticleOpt.isPresent()) {
+                Article updatedArticle = updatedArticleOpt.get();
+                List<Comment> updatedComments = commentService.getAllCommentsByArticleId(updatedArticle.getId());
+                updatedArticle.setComments(updatedComments);
+                request.setAttribute("article", updatedArticle);
+                request.getRequestDispatcher("/WEB-INF/views/article/view.jsp").forward(request, response);
+            } else {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Article not found.");
+            }
         } else {
             // Otherwise, redirect to the comment list page
             response.sendRedirect(request.getContextPath() + "/comment/list");

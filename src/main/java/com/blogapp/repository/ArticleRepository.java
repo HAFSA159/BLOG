@@ -1,11 +1,12 @@
 package com.blogapp.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.blogapp.model.Article;
 
 public interface ArticleRepository {
-    Article findById(Long id);
+    Optional<Article> findById(Long id);
     List<Article> findAll(int offset, int limit, String searchTitle);
     void save(Article article);
     void update(Article article);

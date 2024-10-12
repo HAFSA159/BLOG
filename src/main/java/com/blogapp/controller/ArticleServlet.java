@@ -2,8 +2,10 @@ package com.blogapp.controller;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import com.blogapp.model.Comment;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -33,6 +35,7 @@ public class ArticleServlet extends HttpServlet {
     private ArticleService articleService;
     private AuthorService authorService;
     private CommentService commentService;
+    private HashMap<Long, Article> articleCache = new HashMap<>(); // Using HashMap for caching
 
     @Override
     public void init() throws ServletException {
@@ -50,7 +53,7 @@ public class ArticleServlet extends HttpServlet {
         HttpSession session = request.getSession();
         String loggedInUser = (String) session.getAttribute("loggedInUser");
 
-        switch (action) {
+        switch (Optional.ofNullable(action).orElse("/")) { // Use Optional to avoid null checks
             case "/view":
                 viewArticle(request, response);
                 break;
@@ -121,10 +124,16 @@ public class ArticleServlet extends HttpServlet {
 
         List<Article> articles = articleService.getArticlesByAuthorEmail(loggedInUser, (page - 1) * recordsPerPage,
                 recordsPerPage, searchTitle);
+
+        // Sort articles by creation date in descending order using Stream API
+        List<Article> sortedArticles = articles.stream()
+                .sorted((a1, a2) -> a2.getCreationDate().compareTo(a1.getCreationDate()))
+                .collect(Collectors.toList());
+
         int noOfRecords = articleService.getNumberOfRecordsByAuthorEmail(loggedInUser, searchTitle);
         int noOfPages = (int) Math.ceil(noOfRecords * 1.0 / recordsPerPage);
 
-        request.setAttribute("articles", articles);
+        request.setAttribute("articles", sortedArticles); // Assign sorted articles
         request.setAttribute("noOfPages", noOfPages);
         request.setAttribute("currentPage", page);
         request.setAttribute("searchTitle", searchTitle);
@@ -135,7 +144,9 @@ public class ArticleServlet extends HttpServlet {
             throws ServletException, IOException {
         try {
             Long id = Long.parseLong(request.getParameter("id"));
-            Article article = articleService.getArticleById(id);
+
+            // Use cache to improve performance
+            Article article = getArticleFromCache(id);
 
             if (article != null) {
                 List<Comment> approvedComments = commentService.getApprovedCommentsByArticleId(id);
@@ -168,9 +179,10 @@ public class ArticleServlet extends HttpServlet {
             throws ServletException, IOException {
         try {
             Long id = Long.parseLong(request.getParameter("id"));
-            Article article = articleService.getArticleById(id);
+            Optional<Article> optionalArticle = articleService.getArticleById(id);
 
-            if (article != null) {
+            if (optionalArticle.isPresent()) {
+                Article article = optionalArticle.get();
                 // Check if the logged-in user is the author of the article
                 if (!article.getAuthor().getEmail().equals(loggedInUser)) {
                     request.setAttribute("errorMessage", "You are not authorized to edit this article.");
@@ -232,6 +244,10 @@ public class ArticleServlet extends HttpServlet {
             logger.info("Attempting to add article: {}", newArticle);
             articleService.addArticle(newArticle);
             logger.info("Article added successfully");
+
+            // Cache the new article
+            cacheArticle(newArticle);
+
             response.sendRedirect(request.getContextPath() + "/article/list");
         } catch (Exception e) {
             logger.error("Error creating article: {}", e.getMessage(), e);
@@ -246,6 +262,7 @@ public class ArticleServlet extends HttpServlet {
         String title = request.getParameter("title");
         String content = request.getParameter("content");
         String status = request.getParameter("status");
+
 
         logger.info("Updating article - ID: {}, Title: {}, Status: {}", id, title, status);
 
@@ -272,30 +289,11 @@ public class ArticleServlet extends HttpServlet {
 
     private void deleteArticle(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        String loggedInUser = (String) session.getAttribute("loggedInUser");
-
-        if (loggedInUser == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
-            return;
-        }
-
         Long id = Long.parseLong(request.getParameter("id"));
-        logger.info("Deleting article with ID: {}", id);
-
-        try {
-            Article article = articleService.getArticleById(id);
-            if (article == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Article not found");
-                return;
-            }
-
-            // Check if the logged-in user is the author of the article or an admin
-            if (!article.getAuthor().getEmail().equals(loggedInUser)
-                    && !"Editor".equals(session.getAttribute("userRole"))) {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not authorized to delete this article");
-                return;
-            }
+        articleService.deleteArticle(id);
+        articleCache.remove(id); // Remove from cache after deletion
+        response.sendRedirect(request.getContextPath() + "/article/list");
+    }
 
             articleService.deleteArticle(id);
             logger.info("Article deleted successfully - ID: {}", id);
@@ -307,5 +305,6 @@ public class ArticleServlet extends HttpServlet {
                     "An error occurred while deleting the article");
         }
     }
+
 
 }
