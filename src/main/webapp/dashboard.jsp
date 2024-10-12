@@ -1,13 +1,25 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%  String userRole = (String) session.getAttribute("userRole");
+    request.setAttribute("userRole", userRole); %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <aside class="sidebar w-64 h-screen p-6 text-white">
     <h2 class="text-3xl font-bold">Dashboard</h2>
     <nav class="mt-6">
         <ul>
-            <li class="mb-4">
-                <a href="${pageContext.request.contextPath}/author?action=create" class="block px-4 py-2 rounded-lg bg-purple-300 hover:bg-purple-400 text-gray-900">
-                    Create Author
-                </a>
-            </li>
+            <!-- Show options only available for 'Editor' role -->
+            <c:if test="${userRole == 'Editor'}">
+                <li class="mb-4">
+                    <a href="${pageContext.request.contextPath}/author?action=create" class="block px-4 py-2 rounded-lg bg-purple-300 hover:bg-purple-400 text-gray-900">
+                        Create Author
+                    </a>
+                </li>
+                <li class="mb-4">
+                    <a href="${pageContext.request.contextPath}/author/list" class="block px-4 py-2 rounded-lg bg-blue-400 hover:bg-blue-500 text-white">
+                        View Authors
+                    </a>
+                </li>
+            </c:if>
+            <!-- Options available for both 'Editor' and 'Contributor' roles -->
             <li class="mb-4">
                 <a href="${pageContext.request.contextPath}/article/list" class="block px-4 py-2 rounded-lg bg-indigo-400 hover:bg-indigo-500 text-white">
                     View Articles
@@ -16,11 +28,6 @@
             <li class="mb-4">
                 <a href="${pageContext.request.contextPath}/article/create" class="block px-4 py-2 rounded-lg bg-green-400 hover:bg-green-500 text-white">
                     Create Article
-                </a>
-            </li>
-            <li class="mb-4">
-                <a href="${pageContext.request.contextPath}/author/list" class="block px-4 py-2 rounded-lg bg-blue-400 hover:bg-blue-500 text-white">
-                    View Authors
                 </a>
             </li>
             <li class="mb-4">
@@ -34,6 +41,5 @@
                 </a>
             </li>
         </ul>
-
     </nav>
 </aside>
