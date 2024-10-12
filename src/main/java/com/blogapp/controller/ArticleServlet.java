@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import com.blogapp.model.Comment;
 
 import javax.servlet.ServletException;
@@ -145,10 +148,10 @@ public class ArticleServlet extends HttpServlet {
         try {
             Long id = Long.parseLong(request.getParameter("id"));
 
-            // Use cache to improve performance
-            Article article = getArticleFromCache(id);
+            Optional<Article> optionalArticle = articleService.getArticleById(id);
 
-            if (article != null) {
+            if (optionalArticle.isPresent()) {
+                Article article = optionalArticle.get();
                 List<Comment> approvedComments = commentService.getApprovedCommentsByArticleId(id);
                 article.setComments(approvedComments);
                 request.setAttribute("article", article);
@@ -161,8 +164,8 @@ public class ArticleServlet extends HttpServlet {
             request.setAttribute("errorMessage", "Invalid article ID.");
             response.sendRedirect(request.getContextPath() + "/home");
         } catch (Exception e) {
-            logger.error("Error in viewArticle: ", e);
-            request.setAttribute("errorMessage", "An unexpected error occurred.");
+            logger.error("Error viewing article: ", e);
+            request.setAttribute("errorMessage", "An error occurred while viewing the article.");
             response.sendRedirect(request.getContextPath() + "/home");
         }
     }
@@ -244,10 +247,6 @@ public class ArticleServlet extends HttpServlet {
             logger.info("Attempting to add article: {}", newArticle);
             articleService.addArticle(newArticle);
             logger.info("Article added successfully");
-
-            // Cache the new article
-            cacheArticle(newArticle);
-
             response.sendRedirect(request.getContextPath() + "/article/list");
         } catch (Exception e) {
             logger.error("Error creating article: {}", e.getMessage(), e);
@@ -263,27 +262,26 @@ public class ArticleServlet extends HttpServlet {
         String content = request.getParameter("content");
         String status = request.getParameter("status");
 
-
         logger.info("Updating article - ID: {}, Title: {}, Status: {}", id, title, status);
 
-        Article article = articleService.getArticleById(id);
-        if (article == null) {
+        Optional<Article> optionalArticle = articleService.getArticleById(id);
+        if (!optionalArticle.isPresent()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Article not found");
             return;
         }
 
         // Check if the logged-in user is the author of the article
         String loggedInUser = (String) request.getSession().getAttribute("loggedInUser");
-        if (!article.getAuthor().getEmail().equals(loggedInUser)) {
+        if (!optionalArticle.get().getAuthor().getEmail().equals(loggedInUser)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not authorized to edit this article");
             return;
         }
 
-        article.setTitle(title);
-        article.setContent(content);
-        article.setStatus(ArticleStatus.valueOf(status.toLowerCase()));
+        optionalArticle.get().setTitle(title);
+        optionalArticle.get().setContent(content);
+        optionalArticle.get().setStatus(ArticleStatus.valueOf(status.toLowerCase()));
 
-        articleService.updateArticle(article);
+        articleService.updateArticle(optionalArticle.get());
         response.sendRedirect(request.getContextPath() + "/article/list");
     }
 
@@ -294,17 +292,5 @@ public class ArticleServlet extends HttpServlet {
         articleCache.remove(id); // Remove from cache after deletion
         response.sendRedirect(request.getContextPath() + "/article/list");
     }
-
-            articleService.deleteArticle(id);
-            logger.info("Article deleted successfully - ID: {}", id);
-            String referer = request.getHeader("Referer");
-            response.sendRedirect(referer != null ? referer : request.getContextPath() + "/article/list");
-        } catch (Exception e) {
-            logger.error("Error deleting article: {}", e.getMessage(), e);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    "An error occurred while deleting the article");
-        }
-    }
-
 
 }

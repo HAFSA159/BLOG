@@ -44,6 +44,7 @@ public class Comment {
     private CommentStatus status;
 
     @NotNull(message = "Creation date cannot be null")
+    @Column(name = "creation_date", nullable = false)
     private LocalDateTime creationDate;
 
     // Getters and setters

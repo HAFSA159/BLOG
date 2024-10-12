@@ -63,7 +63,7 @@ public class ArticleRepositoryImpl implements ArticleRepository {
     }
 
     @Override
-    public Article findById(Long id) {
+    public Optional<Article> findById(Long id) {
         logger.debug("Finding article by ID: {}", id);
         Article article = entityManager.find(Article.class, id);
         logger.debug("Article found: {}", article != null);

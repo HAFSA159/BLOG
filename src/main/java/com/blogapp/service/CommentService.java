@@ -32,6 +32,16 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
+    public Comment updateComment(Long commentId, String content) {
+        Comment comment = commentRepository.findById(commentId);
+        if (comment != null) {
+            comment.setContent(content);
+            updateComment(comment);
+            return comment;
+        }
+        return null;
+    }
+
     public void updateComment(Comment comment) {
         logger.info("Updating comment ID: {}", comment.getId());
         commentRepository.update(comment);

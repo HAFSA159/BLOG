@@ -54,6 +54,13 @@ public class CommentServlet extends HttpServlet {
             case "/list":
                 listComments(request, response);
                 break;
+            case "/edit":
+                editComment(request, response);
+                break;
+
+            default:
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                break;
         }
     }
 
@@ -95,7 +102,6 @@ public class CommentServlet extends HttpServlet {
             return;
         }
     
-
         Optional<Article> optionalArticle = articleService.getArticleById(articleId);
         if (!optionalArticle.isPresent()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Article not found.");
@@ -118,6 +124,10 @@ public class CommentServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/article/view?id=" + articleId);
         } catch (Exception e) {
             logger.error("Error creating comment: {}", e.getMessage(), e);
+            logger.error("Stack trace: ", e);
+            if (e.getCause() != null) {
+                logger.error("Cause: {}", e.getCause().getMessage());
+            }
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred while adding the comment: " + e.getMessage());
         }
     }
