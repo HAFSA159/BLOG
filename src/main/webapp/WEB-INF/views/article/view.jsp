@@ -118,26 +118,22 @@
   function submitEditComment() {
     const newContent = document.getElementById('editCommentContent').value;
     if (newContent.trim() !== "") {
-        const form = document.createElement("form");
-        form.method = "post";
-        form.action = "${pageContext.request.contextPath}/comment/edit";
-
-        const commentIdInput = document.createElement("input");
-        commentIdInput.type = "hidden";
-        commentIdInput.name = "commentId";
-        commentIdInput.value = currentCommentId;
-        form.appendChild(commentIdInput);
-
-        const contentInput = document.createElement("input");
-        contentInput.type = "hidden";
-        contentInput.name = "content";
-        contentInput.value = newContent;
-        form.appendChild(contentInput);
-
-        document.body.appendChild(form);
-        form.submit();
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "${pageContext.request.contextPath}/comment/edit", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // Update the comment content in the DOM
+                const commentElement = document.getElementById('comment-' + currentCommentId);
+                const commentContentElement = commentElement.querySelector('p');
+                commentContentElement.textContent = newContent;
+                closeEditPopup();
+            }
+        };
+        xhr.send("commentId=" + currentCommentId + "&content=" + encodeURIComponent(newContent));
     }
     closeEditPopup();
+
 }
 </script>
 
