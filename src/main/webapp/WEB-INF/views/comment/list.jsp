@@ -10,49 +10,77 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <style>
+        body {
+            display: flex;
+            height: 100vh; /* Full height of viewport */
+            overflow: hidden; /* Prevent body overflow */
+        }
         .sidebar {
             background-color: rgba(44, 62, 80, 0.85);
             backdrop-filter: blur(5px);
-            height: 100vh;
+            width: 250px; /* Fixed width for the sidebar */
+            padding: 20px; /* Padding for aesthetics */
+            overflow-y: auto; /* Scroll if needed */
+            position: relative; /* Positioned relative to parent */
         }
         .main-content {
             background-color: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(5px);
-            flex: 1;
+            flex: 1; /* Take remaining space */
             padding: 20px;
+            overflow-y: auto; /* Add scroll if needed */
+            margin-left: 20px; /* Margin to separate from sidebar */
+        }
+        /* Make the table responsive */
+        table {
+            width: 100%; /* Full width */
+            border-collapse: collapse; /* Remove space between cells */
+            margin-top: 20px; /* Margin to separate table from header */
+        }
+        th, td {
+            padding: 12px; /* Padding inside cells */
+            text-align: left; /* Align text to the left */
+        }
+        th {
+            background-color: #f0f0f0; /* Light gray background for header */
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9; /* Zebra striping for rows */
+        }
+        .actions {
+            display: flex; /* Use flexbox for actions */
+            gap: 5px; /* Space between action buttons */
         }
     </style>
 </head>
 <body class="bg-gray-100">
-<div class="flex">
-    <!-- Sidebar -->
-    <div class="sidebar p-4">
-        <%@ include file="/dashboard.jsp" %> <!-- Include the dashboard sidebar here -->
-    </div>
+<div class="content flex">
+    <%@ include file="/dashboard.jsp" %> <!-- Include the dashboard sidebar here -->
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <h1 class="text-3xl font-bold mb-6">Manage Comments</h1>
 
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-            <table id="commentsTable" class="min-w-full text-sm text-left text-gray-800">
-                <thead class="bg-gray-200">
+<div class="main-content">
+    <h1 class="text-3xl font-bold mb-6">Manage Comments</h1>
+
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table id="commentsTable" class="min-w-full text-sm text-left text-gray-800">
+            <thead>
+            <tr>
+                <th>Content</th>
+                <th>Author</th>
+                <th>Article</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+            <c:forEach var="comment" items="${comments}">
                 <tr>
-                    <th class="px-6 py-3">Content</th>
-                    <th class="px-6 py-3">Author</th>
-                    <th class="px-6 py-3">Article</th>
-                    <th class="px-6 py-3">Status</th>
-                    <th class="px-6 py-3">Actions</th>
-                </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                <c:forEach var="comment" items="${comments}">
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">${comment.content}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">${comment.author.name}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">${comment.article.title}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">${comment.status}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                    <td>${comment.content}</td>
+                    <td>${comment.author.name}</td>
+                    <td>${comment.article.title}</td>
+                    <td>${comment.status}</td>
+                    <td>
+                        <div class="actions">
                             <c:choose>
                                 <c:when test="${sessionScope.userRole eq 'Editor' and comment.author.email ne sessionScope.loggedInUser}">
                                     <form action="${pageContext.request.contextPath}/comment/updateStatus" method="post" class="inline">
@@ -64,8 +92,8 @@
                                     </form>
                                 </c:when>
                                 <c:when test="${sessionScope.userRole eq 'Editor' and comment.author.email eq sessionScope.loggedInUser}">
-                                    <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded text-sm mr-2" onclick="openEditPopup(${comment.id}, '${comment.content}')">Edit</button>
-                                    <form action="${pageContext.request.contextPath}/comment/delete" method="post" class="inline mr-2">
+                                    <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded text-sm" onclick="openEditPopup(${comment.id}, '${comment.content}')">Edit</button>
+                                    <form action="${pageContext.request.contextPath}/comment/delete" method="post" class="inline">
                                         <input type="hidden" name="commentId" value="${comment.id}">
                                         <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded text-sm">Delete</button>
                                     </form>
@@ -78,23 +106,19 @@
                                     </form>
                                 </c:when>
                                 <c:when test="${comment.author.email eq sessionScope.loggedInUser}">
-                                    <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded text-sm mr-2" onclick="openEditPopup(${comment.id}, '${comment.content}')">Edit</button>
+                                    <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded text-sm" onclick="openEditPopup(${comment.id}, '${comment.content}')">Edit</button>
                                     <form action="${pageContext.request.contextPath}/comment/delete" method="post" class="inline">
                                         <input type="hidden" name="commentId" value="${comment.id}">
                                         <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded text-sm">Delete</button>
                                     </form>
                                 </c:when>
                             </c:choose>
-                        </td>
-                    </tr>
-                </c:forEach>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="mt-6">
-            <a href="${pageContext.request.contextPath}/dashboard.jsp" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded">Back to Dashboard</a>
-        </div>
+                        </div>
+                    </td>
+                </tr>
+            </c:forEach>
+            </tbody>
+        </table>
     </div>
 </div>
 
