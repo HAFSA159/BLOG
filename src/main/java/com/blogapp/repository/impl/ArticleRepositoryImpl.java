@@ -4,11 +4,13 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.Logger;
 
 import com.blogapp.config.LoggerConfig;
 import com.blogapp.model.Article;
+import com.blogapp.model.ArticleStatus;
 import com.blogapp.repository.ArticleRepository;
 import com.blogapp.util.HibernateUtil;
 
@@ -23,7 +25,38 @@ public class ArticleRepositoryImpl implements ArticleRepository {
     public void setEntityManager(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
+@Override
+public List<Article> getPublishedArticles(int offset, int limit, String searchTitle) {
+    String jpql = "SELECT a FROM Article a WHERE a.status = :status";
+    if (searchTitle != null && !searchTitle.trim().isEmpty()) {
+        jpql += " AND LOWER(a.title) LIKE LOWER(:searchTitle)";
+    }
+    jpql += " ORDER BY a.creationDate DESC";
 
+    TypedQuery<Article> query = entityManager.createQuery(jpql, Article.class);
+    query.setParameter("status", ArticleStatus.published);
+    if (searchTitle != null && !searchTitle.trim().isEmpty()) {
+        query.setParameter("searchTitle", "%" + searchTitle + "%");
+    }
+    query.setFirstResult(offset);
+    query.setMaxResults(limit);
+    return query.getResultList();
+}
+
+@Override
+public int getNoOfPublishedRecords(String searchTitle) {
+    String jpql = "SELECT COUNT(a) FROM Article a WHERE a.status = :status";
+    if (searchTitle != null && !searchTitle.trim().isEmpty()) {
+        jpql += " AND LOWER(a.title) LIKE LOWER(:searchTitle)";
+    }
+
+    TypedQuery<Long> query = entityManager.createQuery(jpql, Long.class);
+    query.setParameter("status", ArticleStatus.published);
+    if (searchTitle != null && !searchTitle.trim().isEmpty()) {
+        query.setParameter("searchTitle", "%" + searchTitle + "%");
+    }
+    return query.getSingleResult().intValue();
+}
     @Override
     public Article findById(Long id) {
         logger.debug("Finding article by ID: {}", id);

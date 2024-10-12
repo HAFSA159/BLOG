@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.blogapp.config.LoggerConfig;
 import com.blogapp.model.Comment;
+import com.blogapp.model.CommentStatus;
 import com.blogapp.repository.CommentRepository;
 
 public class CommentRepositoryImpl implements CommentRepository {
@@ -91,7 +92,14 @@ public class CommentRepositoryImpl implements CommentRepository {
             throw e;
         }
     }
-
+@Override
+public List<Comment> findApprovedByArticleId(Long articleId) {
+    String jpql = "SELECT c FROM Comment c WHERE c.article.id = :articleId AND c.status = :status ORDER BY c.creationDate DESC";
+    return entityManager.createQuery(jpql, Comment.class)
+            .setParameter("articleId", articleId)
+            .setParameter("status", CommentStatus.approved)
+            .getResultList();
+}
     @Override
     public void delete(Long id) {
         logger.info("Deleting comment ID: {}", id);

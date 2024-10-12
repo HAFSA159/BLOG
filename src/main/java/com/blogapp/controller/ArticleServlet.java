@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.util.List;
-
+import com.blogapp.model.Comment;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -137,27 +137,29 @@ public class ArticleServlet extends HttpServlet {
     }
 
     private void viewArticle(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        try {
-            Long id = Long.parseLong(request.getParameter("id"));
-            Article article = articleService.getArticleById(id);
+    throws ServletException, IOException {
+try {
+    Long id = Long.parseLong(request.getParameter("id"));
+    Article article = articleService.getArticleById(id);
 
-            if (article != null) {
-                request.setAttribute("article", article);
-                request.getRequestDispatcher("/WEB-INF/views/article/view.jsp").forward(request, response);
-            } else {
-                request.setAttribute("errorMessage", "Article not found.");
-                response.sendRedirect(request.getContextPath() + "/home");
-            }
-        } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "Invalid article ID.");
-            response.sendRedirect(request.getContextPath() + "/home");
-        } catch (Exception e) {
-            logger.error("Error in viewArticle: ", e);
-            request.setAttribute("errorMessage", "An unexpected error occurred.");
-            response.sendRedirect(request.getContextPath() + "/home");
-        }
+    if (article != null) {
+        List<Comment> approvedComments = commentService.getApprovedCommentsByArticleId(id);
+        article.setComments(approvedComments);
+        request.setAttribute("article", article);
+        request.getRequestDispatcher("/WEB-INF/views/article/view.jsp").forward(request, response);
+    } else {
+        request.setAttribute("errorMessage", "Article not found.");
+        response.sendRedirect(request.getContextPath() + "/home");
     }
+} catch (NumberFormatException e) {
+    request.setAttribute("errorMessage", "Invalid article ID.");
+    response.sendRedirect(request.getContextPath() + "/home");
+} catch (Exception e) {
+    logger.error("Error in viewArticle: ", e);
+    request.setAttribute("errorMessage", "An unexpected error occurred.");
+    response.sendRedirect(request.getContextPath() + "/home");
+}
+}
 
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

@@ -54,41 +54,40 @@
         <section class="mt-8">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Comments</h2>
             <c:forEach var="comment" items="${article.comments}">
-                <div class="bg-gray-50 shadow rounded-lg p-4 mb-4">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="font-semibold text-gray-800">${comment.author.name}</h3>
-                            <p class="mt-2 text-gray-600">${comment.content}</p>
+                <c:if test="${comment.status eq 'approved'}">
+                    <div class="bg-gray-50 shadow rounded-lg p-4 mb-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-gray-800">${comment.author.name}</h3>
+                                <p class="mt-2 text-gray-600">${comment.content}</p>
+                            </div>
                         </div>
-                        <span class="px-2 py-1 bg-gray-200 text-gray-700 rounded-full text-xs">
-                            ${comment.status}
-                        </span>
-                    </div>
-                    <c:if test="${comment.author.email eq sessionScope.loggedInUser || sessionScope.userRole eq 'Editor'}">
-                        <div class="mt-4 flex space-x-2">
-                            <c:if test="${comment.author.email eq sessionScope.loggedInUser}">
-                                <button onclick="openEditPopup(${comment.id}, '${comment.content}')" class="text-blue-500 hover:text-blue-600">
-                                    <i class="fas fa-edit mr-1"></i>Edit
-                                </button>
-                                <form action="${pageContext.request.contextPath}/comment/delete" method="post" class="inline">
-                                    <input type="hidden" name="commentId" value="${comment.id}">
-                                    <button type="submit" class="text-red-500 hover:text-red-600">
-                                        <i class="fas fa-trash-alt mr-1"></i>Delete
+                        <c:if test="${comment.author.email eq sessionScope.loggedInUser || sessionScope.userRole eq 'Editor'}">
+                            <div class="mt-4 flex space-x-2">
+                                <c:if test="${comment.author.email eq sessionScope.loggedInUser}">
+                                    <button onclick="openEditPopup(${comment.id}, '${comment.content}')" class="text-blue-500 hover:text-blue-600">
+                                        <i class="fas fa-edit mr-1"></i>Edit
                                     </button>
-                                </form>
-                            </c:if>
-                            <c:if test="${sessionScope.userRole eq 'Editor'}">
-                                <form action="${pageContext.request.contextPath}/comment/updateStatus" method="post" class="inline">
-                                    <input type="hidden" name="commentId" value="${comment.id}">
-                                    <select name="status" onchange="this.form.submit()" class="bg-gray-200 rounded px-2 py-1 text-sm">
-                                        <option value="approved" ${comment.status eq 'approved' ? 'selected' : ''}>Approved</option>
-                                        <option value="rejected" ${comment.status eq 'rejected' ? 'selected' : ''}>Rejected</option>
-                                    </select>
-                                </form>
-                            </c:if>
-                        </div>
-                    </c:if>
-                </div>
+                                    <form action="${pageContext.request.contextPath}/comment/delete" method="post" class="inline">
+                                        <input type="hidden" name="commentId" value="${comment.id}">
+                                        <button type="submit" class="text-red-500 hover:text-red-600">
+                                            <i class="fas fa-trash-alt mr-1"></i>Delete
+                                        </button>
+                                    </form>
+                                </c:if>
+                                <c:if test="${sessionScope.userRole eq 'Editor'}">
+                                    <form action="${pageContext.request.contextPath}/comment/updateStatus" method="post" class="inline">
+                                        <input type="hidden" name="commentId" value="${comment.id}">
+                                        <select name="status" onchange="this.form.submit()" class="bg-gray-200 rounded px-2 py-1 text-sm">
+                                            <option value="approved" ${comment.status eq 'approved' ? 'selected' : ''}>Approved</option>
+                                            <option value="rejected" ${comment.status eq 'rejected' ? 'selected' : ''}>Rejected</option>
+                                        </select>
+                                    </form>
+                                </c:if>
+                            </div>
+                        </c:if>
+                    </div>
+                </c:if>
             </c:forEach>
 
             <c:if test="${not empty sessionScope.loggedInUser}">

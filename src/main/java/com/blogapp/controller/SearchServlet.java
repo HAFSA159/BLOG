@@ -34,16 +34,8 @@ public class SearchServlet extends HttpServlet {
             page = Integer.parseInt(request.getParameter("page"));
         }
 
-        List<Article> articles;
-        int noOfRecords;
-
-        if (query != null && !query.trim().isEmpty()) {
-            articles = articleService.getAllArticles((page - 1) * recordsPerPage, recordsPerPage, query);
-            noOfRecords = articleService.getNoOfRecords(query);
-        } else {
-            articles = articleService.getAllArticles((page - 1) * recordsPerPage, recordsPerPage, null);
-            noOfRecords = articleService.getNoOfRecords(null);
-        }
+        List<Article> articles = articleService.getPublishedArticles((page - 1) * recordsPerPage, recordsPerPage, query);
+        int noOfRecords = articleService.getNoOfPublishedRecords(query);
 
         int noOfPages = (int) Math.ceil(noOfRecords * 1.0 / recordsPerPage);
 

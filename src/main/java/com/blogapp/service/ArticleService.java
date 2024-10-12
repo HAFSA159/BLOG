@@ -48,4 +48,11 @@ public class ArticleService {
     public int getNumberOfRecordsByAuthorEmail(String authorEmail, String searchTitle) {
         return articleRepository.getNumberOfRecordsByAuthorEmail(authorEmail, searchTitle);
     }
+    public List<Article> getPublishedArticles(int offset, int limit, String searchTitle) {
+        return articleRepository.getPublishedArticles(offset, limit, searchTitle);
+    }
+    
+    public int getNoOfPublishedRecords(String searchTitle) {
+        return articleRepository.getNoOfPublishedRecords(searchTitle);
+    }
 }
