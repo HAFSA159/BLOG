@@ -32,18 +32,28 @@ public class AuthorServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
 
+        // Get the user's role from the session
+        String userRole = (String) request.getSession().getAttribute("userRole");
+
+        // Ensure only Editors can access the listAuthors action
+        if ("list".equalsIgnoreCase(action) && !"EDITOR".equalsIgnoreCase(userRole)) {
+            request.getRequestDispatcher("/home.jsp").forward(request, response);
+            return;
+        }
+
         // Map of action handlers
         Map<String, Runnable> actionHandlers = new HashMap<>();
         actionHandlers.put("list", () -> listAuthors(request, response));
         actionHandlers.put("changeRole", () -> changeRole(request, response));
         actionHandlers.put("edit", () -> showEditForm(request, response));
-        actionHandlers.put("create",()->showAddForm(request, response));
+        actionHandlers.put("create", () -> showAddForm(request, response));
         actionHandlers.put(null, () -> listAuthors(request, response));
 
         actionHandlers.getOrDefault(action, () -> {
             throw new IllegalArgumentException("Invalid action");
         }).run();
     }
+
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
