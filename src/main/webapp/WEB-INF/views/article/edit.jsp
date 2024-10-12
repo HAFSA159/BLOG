@@ -65,7 +65,7 @@
         <h2 class="text-3xl font-semibold italic text-white mb-6">Edit Article</h2>
 
         <div class="form-container p-8 w-full max-w-lg mx-auto">
-            <form action="<c:url value='/article/edit'/>" method="post" enctype="multipart/form-data">
+            <form action="<c:url value='/article/edit'/>" method="post">
                 <input type="hidden" name="id" value="${article.id}">
 
                 <div class="mb-4">
@@ -79,28 +79,11 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="authorId">Author:</label>
-                    <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="authorId" name="authorId" required>
-                        <c:forEach var="author" items="${authors}">
-                            <option value="${author.id}" ${article.author.id eq author.id ? 'selected' : ''}>${author.name}</option>
-                        </c:forEach>
-                    </select>
-                </div>
-
-                <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="status">Status:</label>
                     <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="status" name="status" required>
                         <option value="draft" ${article.status eq 'draft' ? 'selected' : ''}>Draft</option>
                         <option value="published" ${article.status eq 'published' ? 'selected' : ''}>Published</option>
                     </select>
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="image">Image:</label>
-                    <input type="file" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="image" name="image" accept="image/*">
-                    <c:if test="${not empty article.imagePath}">
-                        <p class="mt-2 text-sm text-gray-600">Current image: ${article.imagePath}</p>
-                    </c:if>
                 </div>
 
                 <div class="flex items-center justify-between">

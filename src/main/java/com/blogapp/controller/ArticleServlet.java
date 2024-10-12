@@ -1,15 +1,10 @@
 package com.blogapp.controller;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.blogapp.model.Comment;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -34,7 +29,6 @@ import com.blogapp.service.AuthorService;
 import com.blogapp.service.CommentService;
 
 @WebServlet(name = "ArticleServlet", urlPatterns = { "/article/*" })
-@MultipartConfig
 public class ArticleServlet extends HttpServlet {
 
     private static final Logger logger = LoggerConfig.getLogger(ArticleServlet.class);
@@ -155,6 +149,8 @@ public class ArticleServlet extends HttpServlet {
             Article article = getArticleFromCache(id);
 
             if (article != null) {
+                List<Comment> approvedComments = commentService.getApprovedCommentsByArticleId(id);
+                article.setComments(approvedComments);
                 request.setAttribute("article", article);
                 request.getRequestDispatcher("/WEB-INF/views/article/view.jsp").forward(request, response);
             } else {
@@ -235,17 +231,16 @@ public class ArticleServlet extends HttpServlet {
         newArticle.setContent(content);
         newArticle.setAuthor(author);
         newArticle.setCreationDate(LocalDateTime.now());
-        newArticle.setStatus(ArticleStatus.valueOf(status.toLowerCase()));
+
+        // Handle the status
+        try {
+            newArticle.setStatus(ArticleStatus.valueOf(status.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            logger.warn("Invalid status provided: {}. Defaulting to PUBLISHED.", status);
+            newArticle.setStatus(ArticleStatus.published);
+        }
 
         try {
-            // Handle image upload
-            Part filePart = request.getPart("image");
-            if (filePart != null && filePart.getSize() > 0) {
-                String fileName = getSubmittedFileName(filePart);
-                String filePath = uploadFile(filePart, fileName);
-                newArticle.setImagePath(filePath);
-            }
-
             logger.info("Attempting to add article: {}", newArticle);
             articleService.addArticle(newArticle);
             logger.info("Article added successfully");
@@ -254,9 +249,9 @@ public class ArticleServlet extends HttpServlet {
             cacheArticle(newArticle);
 
             response.sendRedirect(request.getContextPath() + "/article/list");
-        } catch (IOException e) {
-            logger.error("Error while creating article: {}", e.getMessage());
-            request.setAttribute("errorMessage", "Error while creating article.");
+        } catch (Exception e) {
+            logger.error("Error creating article: {}", e.getMessage(), e);
+            request.setAttribute("error", "An error occurred while creating the article: " + e.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/article/create.jsp").forward(request, response);
         }
     }
@@ -268,35 +263,28 @@ public class ArticleServlet extends HttpServlet {
         String content = request.getParameter("content");
         String status = request.getParameter("status");
 
-        Optional<Article> optionalArticle = articleService.getArticleById(id);
-        if (optionalArticle.isPresent()) {
-            Article article = optionalArticle.get();
-            article.setTitle(title);
-            article.setContent(content);
-            article.setStatus(ArticleStatus.valueOf(status.toLowerCase()));
 
-            try {
-                // Handle image upload
-                Part filePart = request.getPart("image");
-                if (filePart != null && filePart.getSize() > 0) {
-                    String fileName = getSubmittedFileName(filePart);
-                    String filePath = uploadFile(filePart, fileName);
-                    article.setImagePath(filePath);
-                }
+        logger.info("Updating article - ID: {}, Title: {}, Status: {}", id, title, status);
 
-                articleService.updateArticle(article);
-                cacheArticle(article); // Update article cache
-
-                response.sendRedirect(request.getContextPath() + "/article/list");
-            } catch (IOException e) {
-                logger.error("Error while updating article: {}", e.getMessage());
-                request.setAttribute("errorMessage", "Error while updating article.");
-                request.getRequestDispatcher("/WEB-INF/views/article/edit.jsp").forward(request, response);
-            }
-        } else {
-            request.setAttribute("errorMessage", "Article not found.");
-            response.sendRedirect(request.getContextPath() + "/article/list");
+        Article article = articleService.getArticleById(id);
+        if (article == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Article not found");
+            return;
         }
+
+        // Check if the logged-in user is the author of the article
+        String loggedInUser = (String) request.getSession().getAttribute("loggedInUser");
+        if (!article.getAuthor().getEmail().equals(loggedInUser)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not authorized to edit this article");
+            return;
+        }
+
+        article.setTitle(title);
+        article.setContent(content);
+        article.setStatus(ArticleStatus.valueOf(status.toLowerCase()));
+
+        articleService.updateArticle(article);
+        response.sendRedirect(request.getContextPath() + "/article/list");
     }
 
     private void deleteArticle(HttpServletRequest request, HttpServletResponse response)
@@ -307,54 +295,16 @@ public class ArticleServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/article/list");
     }
 
-    private Article getArticleFromCache(Long id) {
-        return Optional.ofNullable(articleCache.get(id))
-                .orElseGet(() -> {
-                    Optional<Article> optionalArticle = articleService.getArticleById(id);
-                    if (optionalArticle.isPresent()) {
-                        Article article = optionalArticle.get();
-                        cacheArticle(article);
-                        return article;
-                    }
-                    return null;
-                });
+            articleService.deleteArticle(id);
+            logger.info("Article deleted successfully - ID: {}", id);
+            String referer = request.getHeader("Referer");
+            response.sendRedirect(referer != null ? referer : request.getContextPath() + "/article/list");
+        } catch (Exception e) {
+            logger.error("Error deleting article: {}", e.getMessage(), e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "An error occurred while deleting the article");
+        }
     }
 
-    private void cacheArticle(Article article) {
-        articleCache.put(article.getId(), article);
-    }
 
-    private String uploadFile(Part filePart, String fileName) throws IOException {
-        String projectPath = System.getProperty("user.dir");
-        String uploadDir = projectPath + File.separator + "src" + File.separator + "main" + File.separator + "webapp"
-                + File.separator + "uploads";
-        File uploadDirFile = new File(uploadDir);
-        if (!uploadDirFile.exists()) {
-            if (!uploadDirFile.mkdirs()) {
-                throw new IOException("Failed to create upload directory: " + uploadDir);
-            }
-        }
-        String filePath = uploadDir + File.separator + fileName;
-        try (InputStream inputStream = filePart.getInputStream();
-                OutputStream outputStream = new FileOutputStream(filePath)) {
-            byte[] buffer = new byte[8192];
-            int bytesRead;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
-        }
-        logger.info("File uploaded successfully: {}", filePath);
-        return "/uploads/" + fileName;
-    }
-
-    private String getSubmittedFileName(Part part) {
-        for (String cd : part.getHeader("content-disposition").split(";")) {
-            if (cd.trim().startsWith("filename")) {
-                String fileName = cd.substring(cd.indexOf('=') + 1).trim().replace("\"", "");
-                return fileName.substring(fileName.lastIndexOf('/') + 1)
-                        .substring(fileName.lastIndexOf('\\') + 1);
-            }
-        }
-        return null;
-    }
 }

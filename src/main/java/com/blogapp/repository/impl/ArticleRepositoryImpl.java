@@ -5,11 +5,13 @@ import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.Logger;
 
 import com.blogapp.config.LoggerConfig;
 import com.blogapp.model.Article;
+import com.blogapp.model.ArticleStatus;
 import com.blogapp.repository.ArticleRepository;
 import com.blogapp.util.HibernateUtil;
 
@@ -27,7 +29,41 @@ public class ArticleRepositoryImpl implements ArticleRepository {
     }
 
     @Override
-    public Optional<Article> findById(Long id) {
+
+    public List<Article> getPublishedArticles(int offset, int limit, String searchTitle) {
+        String jpql = "SELECT a FROM Article a WHERE a.status = :status";
+        if (searchTitle != null && !searchTitle.trim().isEmpty()) {
+            jpql += " AND LOWER(a.title) LIKE LOWER(:searchTitle)";
+        }
+        jpql += " ORDER BY a.creationDate DESC";
+
+        TypedQuery<Article> query = entityManager.createQuery(jpql, Article.class);
+        query.setParameter("status", ArticleStatus.published);
+        if (searchTitle != null && !searchTitle.trim().isEmpty()) {
+            query.setParameter("searchTitle", "%" + searchTitle + "%");
+        }
+        query.setFirstResult(offset);
+        query.setMaxResults(limit);
+        return query.getResultList();
+    }
+
+    @Override
+    public int getNoOfPublishedRecords(String searchTitle) {
+        String jpql = "SELECT COUNT(a) FROM Article a WHERE a.status = :status";
+        if (searchTitle != null && !searchTitle.trim().isEmpty()) {
+            jpql += " AND LOWER(a.title) LIKE LOWER(:searchTitle)";
+        }
+
+        TypedQuery<Long> query = entityManager.createQuery(jpql, Long.class);
+        query.setParameter("status", ArticleStatus.published);
+        if (searchTitle != null && !searchTitle.trim().isEmpty()) {
+            query.setParameter("searchTitle", "%" + searchTitle + "%");
+        }
+        return query.getSingleResult().intValue();
+    }
+
+    @Override
+    public Article findById(Long id) {
         logger.debug("Finding article by ID: {}", id);
         Article article = entityManager.find(Article.class, id);
         logger.debug("Article found: {}", article != null);
@@ -49,33 +85,34 @@ public class ArticleRepositoryImpl implements ArticleRepository {
 
     @Override
     public List<Article> getArticlesByAuthorEmail(String authorEmail, int offset, int limit, String searchTitle) {
-        logger.debug("Finding articles by author email: {} - offset: {}, limit: {}, searchTitle: {}", authorEmail, offset, limit, searchTitle);
+        logger.debug("Finding articles by author email: {} - offset: {}, limit: {}, searchTitle: {}", authorEmail,
+                offset, limit, searchTitle);
         String jpql = "SELECT a FROM Article a JOIN a.author au WHERE au.email = :authorEmail " +
-                      "AND (:searchTitle IS NULL OR a.title LIKE :searchTitle) " +
-                      "ORDER BY a.creationDate DESC";
-        
+                "AND (:searchTitle IS NULL OR a.title LIKE :searchTitle) " +
+                "ORDER BY a.creationDate DESC";
+
         List<Article> articles = entityManager.createQuery(jpql, Article.class)
                 .setParameter("authorEmail", authorEmail)
                 .setParameter("searchTitle", searchTitle == null ? null : "%" + searchTitle + "%")
                 .setFirstResult(offset)
                 .setMaxResults(limit)
                 .getResultList();
-        
+
         logger.debug("Query executed. Number of articles found: {}", articles.size());
         return articles;
     }
-    
+
     @Override
     public int getNumberOfRecordsByAuthorEmail(String authorEmail, String searchTitle) {
         logger.debug("Getting number of records by author email: {}. SearchTitle: {}", authorEmail, searchTitle);
         String jpql = "SELECT COUNT(a) FROM Article a JOIN a.author au WHERE au.email = :authorEmail " +
-                      "AND (:searchTitle IS NULL OR a.title LIKE :searchTitle)";
-        
+                "AND (:searchTitle IS NULL OR a.title LIKE :searchTitle)";
+
         Long count = entityManager.createQuery(jpql, Long.class)
                 .setParameter("authorEmail", authorEmail)
                 .setParameter("searchTitle", searchTitle == null ? null : "%" + searchTitle + "%")
                 .getSingleResult();
-        
+
         logger.debug("Number of records found: {}", count);
         return count.intValue();
     }

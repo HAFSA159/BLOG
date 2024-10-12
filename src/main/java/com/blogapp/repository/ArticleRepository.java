@@ -14,4 +14,6 @@ public interface ArticleRepository {
     int getNoOfRecords(String searchTitle);
     List<Article> getArticlesByAuthorEmail(String authorEmail, int offset, int limit, String searchTitle);
     int getNumberOfRecordsByAuthorEmail(String authorEmail, String searchTitle);
+    List<Article> getPublishedArticles(int offset, int limit, String searchTitle);
+    int getNoOfPublishedRecords(String searchTitle);
 }

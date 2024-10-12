@@ -12,4 +12,5 @@ public interface CommentRepository {
     void delete(Long id);
     List<Comment> findAll();
     List<Comment> findByAuthorEmail(String email);
+    List<Comment> findApprovedByArticleId(Long articleId);
 }

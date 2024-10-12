@@ -95,6 +95,7 @@ public class CommentServlet extends HttpServlet {
             return;
         }
     
+
         Optional<Article> optionalArticle = articleService.getArticleById(articleId);
         if (!optionalArticle.isPresent()) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Article not found.");
@@ -114,12 +115,7 @@ public class CommentServlet extends HttpServlet {
             commentService.addComment(newComment);
             logger.info("Comment added successfully");
     
-            // Refresh the article data
-            List<Comment> updatedComments = commentService.getAllCommentsByArticleId(articleId);
-            article.setComments(updatedComments);
-    
-            request.setAttribute("article", article);
-            request.getRequestDispatcher("/WEB-INF/views/article/view.jsp").forward(request, response);
+            response.sendRedirect(request.getContextPath() + "/article/view?id=" + articleId);
         } catch (Exception e) {
             logger.error("Error creating comment: {}", e.getMessage(), e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred while adding the comment: " + e.getMessage());

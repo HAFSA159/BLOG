@@ -61,4 +61,8 @@ public class CommentService {
         logger.info("Getting comments for author email: {}", email);
         return commentRepository.findByAuthorEmail(email);
     }
+    public List<Comment> getApprovedCommentsByArticleId(Long articleId) {
+        logger.info("Getting approved comments for article ID: {}", articleId);
+        return commentRepository.findApprovedByArticleId(articleId);
+    }
 }

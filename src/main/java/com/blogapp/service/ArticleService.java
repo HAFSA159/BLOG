@@ -55,32 +55,11 @@ public class ArticleService {
     public int getNumberOfRecordsByAuthorEmail(String authorEmail, String searchTitle) {
         return articleRepository.getNumberOfRecordsByAuthorEmail(authorEmail, searchTitle);
     }
-
-    // Fetch all articles by an author with title search (using Stream API)
-    public List<Article> searchArticlesByTitle(String searchTitle) {
-        return articleRepository.findAll(0, Integer.MAX_VALUE, null)
-                .stream()
-                .filter(article -> article.getTitle().toLowerCase().contains(searchTitle.toLowerCase()))
-                .collect(Collectors.toList());
+    public List<Article> getPublishedArticles(int offset, int limit, String searchTitle) {
+        return articleRepository.getPublishedArticles(offset, limit, searchTitle);
     }
-
-    // Get all articles for the author and sort by creation date (using Streams)
-    public List<Article> getSortedArticlesByAuthorEmail(String authorEmail, String searchTitle) {
-        return articleRepository.getArticlesByAuthorEmail(authorEmail, 0, Integer.MAX_VALUE, searchTitle)
-                .stream()
-                .sorted((a1, a2) -> a2.getCreationDate().compareTo(a1.getCreationDate())) // Descending order
-                .collect(Collectors.toList());
-    }
-
-    // Get a list of articles that have been published (status = PUBLISHED)
-    public List<Article> getPublishedArticles() {
-        return articleRepository.findAll(0, Integer.MAX_VALUE, null)
-                .stream()
-                .filter(article -> article.getStatus() == ArticleStatus.published)
-                .collect(Collectors.toList());
-    }
-
-    public ArticleRepository getArticleRepository() {
-        return articleRepository;
+    
+    public int getNoOfPublishedRecords(String searchTitle) {
+        return articleRepository.getNoOfPublishedRecords(searchTitle);
     }
 }
