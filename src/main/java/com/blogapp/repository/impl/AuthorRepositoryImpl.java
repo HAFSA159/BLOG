@@ -10,12 +10,15 @@ import com.blogapp.repository.AuthorRepository;
 import com.blogapp.util.HibernateUtil;
 
 public class AuthorRepositoryImpl implements AuthorRepository {
-    private final EntityManager entityManager;
+    private EntityManager entityManager;
 
     public AuthorRepositoryImpl() {
         this.entityManager = HibernateUtil.getEntityManager();
     }
 
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
     @Override
     public Author findById(Long id) {
         return entityManager.find(Author.class, id);

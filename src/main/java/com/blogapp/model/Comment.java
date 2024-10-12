@@ -6,37 +6,45 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.*;
+import javax.validation.constraints.*;
 
+import java.time.LocalDateTime;
 @Entity
 @Table(name = "Comment")
 public class Comment {
-    @Id
+   @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @NotNull(message = "Content cannot be null")
+    @Size(min = 1, max = 1000, message = "Comment must be between 1 and 1000 characters")
+    @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "creation_date", nullable = false)
-    private LocalDateTime creationDate;
+    @NotNull(message = "Author cannot be null")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private Author author;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private CommentStatus status;
-
-    @ManyToOne
-    @JoinColumn(name = "article_id", nullable = false)
+    @NotNull(message = "Article cannot be null")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "article_id")
     private Article article;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id", nullable = false)
-    private Author author;
+    @NotNull(message = "Status cannot be null")
+    @Enumerated(EnumType.STRING)
+    private CommentStatus status;
+
+    @NotNull(message = "Creation date cannot be null")
+    private LocalDateTime creationDate;
 
     // Getters and setters
     public Long getId() {

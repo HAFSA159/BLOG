@@ -3,9 +3,7 @@ package com.blogapp.repository.impl;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 
 import org.apache.logging.log4j.Logger;
 
@@ -13,15 +11,19 @@ import com.blogapp.config.LoggerConfig;
 import com.blogapp.model.Comment;
 import com.blogapp.model.CommentStatus;
 import com.blogapp.repository.CommentRepository;
+import com.blogapp.util.HibernateUtil;
 
 public class CommentRepositoryImpl implements CommentRepository {
 
     private static final Logger logger = LoggerConfig.getLogger(CommentRepositoryImpl.class);
-    private final EntityManager entityManager;
+    private EntityManager entityManager;
 
-    public CommentRepositoryImpl() {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("blogapp");
-        this.entityManager = emf.createEntityManager();
+      public CommentRepositoryImpl() {
+        this.entityManager = HibernateUtil.getEntityManager();
+    }
+
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     @Override

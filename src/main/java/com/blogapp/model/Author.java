@@ -13,6 +13,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.*;
+import org.hibernate.validator.constraints.Email;
 
 @Entity
 @Table(name = "Author")
@@ -21,21 +23,25 @@ public class Author {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @NotNull(message = "Name cannot be null")
+    @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
     private String name;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @NotNull(message = "Email cannot be null")
+    @Email(message = "Email should be valid")
+    @Column(unique = true)
     private String email;
 
-    @Column(nullable = false, length = 100)
+    @NotNull(message = "Password cannot be null")
+    @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password;
 
-    @Column(nullable = false)
-    private LocalDate birthdate;
-
+    @NotNull(message = "Role cannot be null")
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private AuthorRole role;
+
+    @Past(message = "Birthdate must be in the past")
+    private LocalDate birthdate;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Article> articles;
