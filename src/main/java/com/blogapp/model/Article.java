@@ -46,7 +46,6 @@ public class Article {
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
-    private String imagePath;
 
     // Getters and setters
     public Long getId() {
@@ -113,11 +112,4 @@ public class Article {
         this.comments = comments;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }
-
-    public String getImagePath() {
-        return imagePath;
-    }
 }

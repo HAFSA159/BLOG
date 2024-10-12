@@ -81,37 +81,32 @@ public class CommentServlet extends HttpServlet {
         Long articleId = Long.parseLong(request.getParameter("articleId"));
         String content = request.getParameter("content");
         String authorEmail = (String) request.getSession().getAttribute("loggedInUser");
-
+    
         if (authorEmail == null) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User is not authenticated.");
             return;
         }
-
+    
         Author author = authorService.getAuthorByEmail(authorEmail);
         if (author == null) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not found.");
             return;
         }
-
+    
         Comment newComment = new Comment();
         newComment.setContent(content);
         newComment.setArticle(articleService.getArticleById(articleId));
         newComment.setAuthor(author);
         newComment.setCreationDate(LocalDateTime.now());
         newComment.setStatus(CommentStatus.approved);
-
+    
         try {
             logger.info("Attempting to add comment: {}", newComment);
             commentService.addComment(newComment);
             logger.info("Comment added successfully");
-
-            // Refresh the article data
-            Article updatedArticle = articleService.getArticleById(articleId);
-            List<Comment> updatedComments = commentService.getAllCommentsByArticleId(articleId);
-            updatedArticle.setComments(updatedComments);
-
-            request.setAttribute("article", updatedArticle);
-            request.getRequestDispatcher("/WEB-INF/views/article/view.jsp").forward(request, response);
+    
+            // Redirect to the article view page
+            response.sendRedirect(request.getContextPath() + "/article/view?id=" + articleId);
         } catch (Exception e) {
             logger.error("Error creating comment: {}", e.getMessage(), e);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred while adding the comment: " + e.getMessage());

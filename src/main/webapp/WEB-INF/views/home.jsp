@@ -55,9 +55,6 @@
         <c:forEach var="article" items="${articles}">
             <c:if test="${article.status eq 'published'}">
                 <div class="bg-white rounded-lg shadow-md overflow-hidden transition duration-300 hover:shadow-xl">
-                    <c:if test="${not empty article.imagePath}">
-                        <img src="${pageContext.request.contextPath}${article.imagePath}" alt="${article.title}" class="w-full h-48 object-cover">
-                    </c:if>
                     <div class="p-6">
                         <h2 class="text-2xl font-semibold mb-2 text-gray-800">${article.title}</h2>
                         <p class="text-gray-600 mb-4">

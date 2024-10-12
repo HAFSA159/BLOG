@@ -62,37 +62,28 @@
         <h2 class="text-3xl font-semibold italic text-white mb-6">Create New Article</h2>
 
         <div class="form-container p-8 w-full max-w-lg mx-auto">
-            <form action="<c:url value='/article/create'/>" method="post" enctype="multipart/form-data">
+            <form action="<c:url value='/article/create'/>" method="post">
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="title">Title:</label>
                     <input type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="title" name="title" required placeholder="Article Title">
                 </div>
-
+                
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="content">Content:</label>
                     <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="content" name="content" rows="10" required placeholder="Write your article here..."></textarea>
                 </div>
-
+                
                 <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="authorId">Author:</label>
-                    <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="authorId" name="authorId" required>
-                        <c:forEach var="author" items="${authors}">
-                            <option value="${author.id}">${author.name}</option>
-                        </c:forEach>
-                    </select>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="publicationDate">Publication Date:</label>
+                    <input type="datetime-local" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="publicationDate" name="publicationDate">
                 </div>
-
+                
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="status">Status:</label>
                     <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="status" name="status" required>
-                        <option value="draft">Draft</option>
-                        <option value="published">Published</option>
+                        <option value="DRAFT">Draft</option>
+                        <option value="PUBLISHED">Published</option>
                     </select>
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="image">Image:</label>
-                    <input type="file" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="image" name="image" accept="image/*">
                 </div>
 
                 <div class="flex items-center justify-between">

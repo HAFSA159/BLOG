@@ -21,7 +21,6 @@ CREATE TABLE Article (
     publication_date DATETIME,
     status ENUM('draft', 'published') NOT NULL,
     author_id INT NOT NULL,
-    image_path VARCHAR(255),
     FOREIGN KEY (author_id) REFERENCES Author(id)
 );
 
@@ -45,11 +44,11 @@ INSERT INTO Author (name, email, password, birthdate, role) VALUES
 ('Bob Williams', 'bob.williams@example.com', '$2a$10$Zs8gGTh3AapgHqsIXDZu1O963oYMhOBUSf7z0u8DBXZ6HIb92gd5W', '1982-11-30', 'Editor');
 
 -- Insert sample data into Article
-INSERT INTO Article (title, content, creation_date, publication_date, status, author_id, image_path) VALUES
-('First Blog Post', 'This is the content of the first blog post.', '2023-05-01 10:00:00', '2023-05-02 12:00:00', 'published', 1, '/images/first-post.jpg'),
-('Draft Article', 'This article is still in draft.', '2023-05-03 09:00:00', NULL, 'draft', 2, NULL),
-('Tech News', 'Latest updates in the tech world.', '2023-05-04 11:00:00', '2023-05-05 10:00:00', 'published', 3, '/images/tech-news.jpg'),
-('Archived Post', 'This post has been archived.', '2023-04-15 14:00:00', '2023-04-16 09:00:00', 'draft', 4, '/images/archived-post.jpg');
+INSERT INTO Article (title, content, creation_date, publication_date, status, author_id) VALUES
+('First Blog Post', 'This is the content of the first blog post.', '2023-05-01 10:00:00', '2023-05-02 12:00:00', 'published', 1),
+('Draft Article', 'This article is still in draft.', '2023-05-03 09:00:00', NULL, 'draft', 2),
+('Tech News', 'Latest updates in the tech world.', '2023-05-04 11:00:00', '2023-05-05 10:00:00', 'published', 3),
+('Archived Post', 'This post has been archived.', '2023-04-15 14:00:00', '2023-04-16 09:00:00', 'draft', 4);
 
 -- Insert sample data into Comment
 INSERT INTO Comment (content, creation_date, status, article_id, author_id) VALUES
