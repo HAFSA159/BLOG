@@ -1,6 +1,7 @@
 package com.blogapp.repository.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -15,6 +16,7 @@ import com.blogapp.util.HibernateUtil;
 public class ArticleRepositoryImpl implements ArticleRepository {
     private static final Logger logger = LoggerConfig.getLogger(ArticleRepositoryImpl.class);
     private EntityManager entityManager;
+
     public ArticleRepositoryImpl() {
         this.entityManager = HibernateUtil.getEntityManager();
         logger.info("ArticleRepositoryImpl initialized with EntityManager");
@@ -25,11 +27,11 @@ public class ArticleRepositoryImpl implements ArticleRepository {
     }
 
     @Override
-    public Article findById(Long id) {
+    public Optional<Article> findById(Long id) {
         logger.debug("Finding article by ID: {}", id);
         Article article = entityManager.find(Article.class, id);
         logger.debug("Article found: {}", article != null);
-        return article;
+        return Optional.ofNullable(article);
     }
 
     @Override
@@ -37,13 +39,14 @@ public class ArticleRepositoryImpl implements ArticleRepository {
         logger.debug("Finding all articles - offset: {}, limit: {}, searchTitle: {}", offset, limit, searchTitle);
         String jpql = "FROM Article a WHERE :searchTitle IS NULL OR a.title LIKE :searchTitle ORDER BY a.creationDate DESC";
         List<Article> articles = entityManager.createQuery(jpql, Article.class)
-                 .setParameter("searchTitle", searchTitle == null ? null : "%" + searchTitle + "%")
-                 .setFirstResult(offset)
-                 .setMaxResults(limit)
-                 .getResultList();
+                .setParameter("searchTitle", searchTitle == null ? null : "%" + searchTitle + "%")
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
         logger.debug("Query executed. Number of articles found: {}", articles.size());
         return articles;
     }
+
     @Override
     public List<Article> getArticlesByAuthorEmail(String authorEmail, int offset, int limit, String searchTitle) {
         logger.debug("Finding articles by author email: {} - offset: {}, limit: {}, searchTitle: {}", authorEmail, offset, limit, searchTitle);
@@ -76,6 +79,7 @@ public class ArticleRepositoryImpl implements ArticleRepository {
         logger.debug("Number of records found: {}", count);
         return count.intValue();
     }
+
     @Override
     public void save(Article article) {
         logger.info("Saving new article: {}", article.getTitle());
@@ -140,12 +144,11 @@ public class ArticleRepositoryImpl implements ArticleRepository {
     public int getNoOfRecords(String searchTitle) {
         logger.debug("Getting number of records. SearchTitle: {}", searchTitle);
         String jpql = "SELECT COUNT(a) FROM Article a WHERE :searchTitle IS NULL OR a.title LIKE :searchTitle";
-        int count = entityManager.createQuery(jpql, Long.class)
+        Long count = entityManager.createQuery(jpql, Long.class)
                 .setParameter("searchTitle", searchTitle == null ? null : "%" + searchTitle + "%")
-                .getSingleResult()
-                .intValue();
+                .getSingleResult();
         logger.debug("Number of records found: {}", count);
-        return count;
+        return count.intValue();
     }
 
     public void close() {
